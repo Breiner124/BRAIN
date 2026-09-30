@@ -17,12 +17,16 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function EcomPage() {
-  const unidades = getUnidades();
+export default async function EcomPage() {
+  const [unidades, profile, proyeccionesRaw] = await Promise.all([
+    getUnidades(),
+    getProfile(),
+    getProyecciones(),
+  ]);
   const unidad = unidades.find((u) => u.slug === "ecom");
-  const margen = getProfile().margen_neto_bolsillo;
+  const margen = profile.margen_neto_bolsillo;
   const escenarios = getEscenarios();
-  const proyecciones = getProyecciones().filter(
+  const proyecciones = proyeccionesRaw.filter(
     (p) => p.ambito === "empresarial" && p.unidad_id === unidad?.id
   );
   const expansiones = proyecciones.filter(

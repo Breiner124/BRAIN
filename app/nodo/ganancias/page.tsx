@@ -11,10 +11,12 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function GananciasPage() {
-  const ingresos = getIngresos();
-  const unidades = getUnidades();
-  const m = motor();
+export default async function GananciasPage() {
+  const [ingresos, unidades, m] = await Promise.all([
+    getIngresos(),
+    getUnidades(),
+    motor(),
+  ]);
 
   return (
     <NodeShell

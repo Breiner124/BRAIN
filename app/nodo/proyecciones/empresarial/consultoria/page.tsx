@@ -11,12 +11,16 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function ConsultoriaPage() {
-  const unidades = getUnidades();
+export default async function ConsultoriaPage() {
+  const [unidades, ingresosRaw, proyeccionesRaw] = await Promise.all([
+    getUnidades(),
+    getIngresos(),
+    getProyecciones(),
+  ]);
   const unidad = unidades.find((u) => u.slug === "consultoria");
-  const ingresos = getIngresos().filter((i) => i.fuente === "consultoria");
+  const ingresos = ingresosRaw.filter((i) => i.fuente === "consultoria");
   const realizado = ingresos.reduce((s, i) => s + i.monto, 0);
-  const proyecciones = getProyecciones().filter(
+  const proyecciones = proyeccionesRaw.filter(
     (p) => p.ambito === "empresarial" && p.unidad_id === unidad?.id
   );
   const esperadoTotal = proyecciones.reduce(

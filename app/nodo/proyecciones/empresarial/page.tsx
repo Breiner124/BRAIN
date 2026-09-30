@@ -13,11 +13,15 @@ import { formatCOPCompact } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function EmpresarialHubPage() {
-  const proyecciones = getProyecciones().filter((p) => p.ambito === "empresarial");
-  const ingresos = getIngresos();
+export default async function EmpresarialHubPage() {
+  const [proyeccionesRaw, ingresos, profile] = await Promise.all([
+    getProyecciones(),
+    getIngresos(),
+    getProfile(),
+  ]);
+  const proyecciones = proyeccionesRaw.filter((p) => p.ambito === "empresarial");
   const escenarios = getEscenarios();
-  const margen = getProfile().margen_neto_bolsillo;
+  const margen = profile.margen_neto_bolsillo;
 
   const realizadoConsultoria = ingresos
     .filter((i) => i.fuente === "consultoria")

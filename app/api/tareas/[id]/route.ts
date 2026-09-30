@@ -12,7 +12,7 @@ export async function PATCH(
 ) {
   try {
     const { estado } = schema.parse(await req.json());
-    return ok(cambiarEstadoTarea(params.id, estado));
+    return ok(await cambiarEstadoTarea(params.id, estado));
   } catch (e) {
     return handleError(e);
   }

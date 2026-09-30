@@ -4,6 +4,7 @@ import {
   getMetas,
   getProyecciones,
   getIngresos,
+  getProfile,
   motor,
   facturacionRealDiaria,
 } from "@/lib/data/repository";
@@ -50,13 +51,17 @@ function netoIngreso(monto: number, esFact: boolean, margen: number): number {
   return esFact ? monto * margen : monto;
 }
 
-export function construirResumen(hoy = new Date()): ResumenNodo {
-  const m = motor(hoy);
-  const ingresos = getIngresos();
-  const deudas = getDeudas();
-  const metas = getMetas();
-  const proyecciones = getProyecciones();
-  const margen = m.cruce.ingreso_mensual >= 0 ? 0.15 : 0.15; // margen perfil (demo)
+export async function construirResumen(hoy = new Date()): Promise<ResumenNodo> {
+  const [m, profile, ingresos, deudas, metas, proyecciones, factReal] = await Promise.all([
+    motor(hoy),
+    getProfile(),
+    getIngresos(),
+    getDeudas(),
+    getMetas(),
+    getProyecciones(),
+    facturacionRealDiaria(hoy),
+  ]);
+  const margen = profile.margen_neto_bolsillo;
 
   // Ganancias del mes vs anterior
   const mesAnteriorRef = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 15);
@@ -127,7 +132,7 @@ export function construirResumen(hoy = new Date()): ResumenNodo {
         : undefined,
     },
     maestro: {
-      facturacion_real_diaria: facturacionRealDiaria(hoy),
+      facturacion_real_diaria: factReal,
       facturacion_diaria_ideal: m.combinado.facturacion_diaria_ideal,
       semaforo: m.combinado.semaforo,
     },

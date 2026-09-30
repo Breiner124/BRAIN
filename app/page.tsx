@@ -6,10 +6,12 @@ import { construirResumen } from "@/lib/summary";
 // El store en memoria cambia entre requests → render dinámico.
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const nodos = getNodos();
-  const conexiones = getConexiones();
-  const resumen = construirResumen();
+export default async function HomePage() {
+  const [nodos, conexiones, resumen] = await Promise.all([
+    getNodos(),
+    getConexiones(),
+    construirResumen(),
+  ]);
 
   return (
     <main className="relative">

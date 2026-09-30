@@ -10,8 +10,8 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function ProyeccionesPersonalesPage() {
-  const personales = getProyecciones().filter((p) => p.ambito === "personal");
+export default async function ProyeccionesPersonalesPage() {
+  const personales = (await getProyecciones()).filter((p) => p.ambito === "personal");
   const objetivoGlobal = personales.reduce(
     (s, p) => s + (p.objetivo ?? p.costo_estimado ?? 0),
     0

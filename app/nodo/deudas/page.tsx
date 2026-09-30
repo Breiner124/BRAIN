@@ -6,8 +6,8 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function DeudasPage() {
-  const deudas = [...getDeudas()].sort(
+export default async function DeudasPage() {
+  const deudas = [...(await getDeudas())].sort(
     (a, b) => a.nivel_importancia - b.nivel_importancia
   );
   const activas = deudas.filter((d) => d.estado === "activa");

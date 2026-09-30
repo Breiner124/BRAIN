@@ -10,7 +10,7 @@ import {
   aportarProyeccion,
   crearIngreso,
   getIngresos,
-} from "@/lib/data/repository";
+} from "@/lib/data/mem-repo";
 
 beforeEach(() => resetDB());
 

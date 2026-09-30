@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    return ok(construirAlertas());
+    return ok(await construirAlertas());
   } catch (e) {
     return handleError(e);
   }

@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    return ok(pagarDeudaTotal(params.id));
+    return ok(await pagarDeudaTotal(params.id));
   } catch (e) {
     return handleError(e);
   }

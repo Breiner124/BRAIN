@@ -15,8 +15,8 @@ const schema = z.object({
 
 export async function GET() {
   try {
-    const activa = getSemanaActiva();
-    return ok(getTareas(activa?.id));
+    const activa = await getSemanaActiva();
+    return ok(await getTareas(activa?.id));
   } catch (e) {
     return handleError(e);
   }
@@ -25,7 +25,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
-    return ok(crearTarea(body), 201);
+    return ok(await crearTarea(body), 201);
   } catch (e) {
     return handleError(e);
   }

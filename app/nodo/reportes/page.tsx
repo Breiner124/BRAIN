@@ -13,11 +13,16 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function ReportesPage() {
-  const margen = getProfile().margen_neto_bolsillo;
-  const serie = serieMensual(getIngresos(), getEgresos(), margen, new Date(), 6);
+export default async function ReportesPage() {
+  const [profile, ingresos, egresos, reuniones] = await Promise.all([
+    getProfile(),
+    getIngresos(),
+    getEgresos(),
+    getReuniones(),
+  ]);
+  const margen = profile.margen_neto_bolsillo;
+  const serie = serieMensual(ingresos, egresos, margen, new Date(), 6);
   const totales = totalesReporte(serie);
-  const reuniones = getReuniones();
   const calendly = reuniones.filter((r) => r.fuente === "calendly").length;
 
   const tiles = [

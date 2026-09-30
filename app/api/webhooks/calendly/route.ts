@@ -42,6 +42,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Payload sin start_time" }, { status: 422 });
   }
 
-  const guardada = upsertReunionCalendly(reunion);
+  const guardada = await upsertReunionCalendly(reunion);
   return NextResponse.json({ ok: true, data: guardada }, { status: 201 });
 }

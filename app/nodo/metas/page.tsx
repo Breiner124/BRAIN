@@ -7,9 +7,9 @@ import { formatCOP } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function MetasPage() {
-  const metas = [...getMetas()].sort((a, b) => a.prioridad - b.prioridad);
-  const m = motor();
+export default async function MetasPage() {
+  const [metasRaw, m] = await Promise.all([getMetas(), motor()]);
+  const metas = [...metasRaw].sort((a, b) => a.prioridad - b.prioridad);
   const aportePorMeta = new Map(
     m.optimo_metas.aportes.map((a) => [a.meta_id, a])
   );

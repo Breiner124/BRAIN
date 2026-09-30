@@ -7,9 +7,8 @@ import { formatCOPCompact } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function ProyeccionesHubPage() {
-  const proyecciones = getProyecciones();
-  const m = motor();
+export default async function ProyeccionesHubPage() {
+  const [proyecciones, m] = await Promise.all([getProyecciones(), motor()]);
   const personales = proyecciones.filter((p) => p.ambito === "personal");
   const empresariales = proyecciones.filter((p) => p.ambito === "empresarial");
 

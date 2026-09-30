@@ -15,7 +15,7 @@ const schema = z.object({
 
 export async function GET() {
   try {
-    return ok(getReuniones());
+    return ok(await getReuniones());
   } catch (e) {
     return handleError(e);
   }
@@ -24,7 +24,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
-    return ok(crearReunion(body), 201);
+    return ok(await crearReunion(body), 201);
   } catch (e) {
     return handleError(e);
   }

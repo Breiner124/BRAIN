@@ -1,11 +1,6 @@
 // ── Alertas / notificaciones derivadas del estado (§13 Fase 3) ─────
 // No hay push infra: son señales calculadas del propio cerebro.
-import {
-  getDeudas,
-  getMetas,
-  motor,
-  facturacionRealDiaria,
-} from "@/lib/data/repository";
+import { getDeudas, motor, facturacionRealDiaria } from "@/lib/data/repository";
 import { mesesRestantes } from "@/lib/engine";
 import { formatCOPCompact } from "@/lib/format";
 
@@ -19,9 +14,13 @@ export interface Alerta {
   href?: string;
 }
 
-export function construirAlertas(hoy = new Date()): Alerta[] {
+export async function construirAlertas(hoy = new Date()): Promise<Alerta[]> {
   const alertas: Alerta[] = [];
-  const m = motor(hoy);
+  const [m, deudas, factReal] = await Promise.all([
+    motor(hoy),
+    getDeudas(),
+    facturacionRealDiaria(hoy),
+  ]);
 
   // 1. Semáforo maestro
   if (m.combinado.semaforo === "rojo") {
@@ -31,7 +30,7 @@ export function construirAlertas(hoy = new Date()): Alerta[] {
       titulo: "No cubres tus proyecciones",
       detalle: `Necesitas facturar ≥ ${formatCOPCompact(
         m.combinado.facturacion_diaria_para_proyecciones
-      )}/día. Vas en ${formatCOPCompact(facturacionRealDiaria(hoy))}/día.`,
+      )}/día. Vas en ${formatCOPCompact(factReal)}/día.`,
       href: "/nodo/ganancias",
     });
   } else if (m.combinado.semaforo === "amarillo") {
@@ -47,7 +46,7 @@ export function construirAlertas(hoy = new Date()): Alerta[] {
   }
 
   // 2. Deudas con fecha límite próxima (≤ 30 días) o activas de alta importancia
-  for (const d of getDeudas()) {
+  for (const d of deudas) {
     if (d.estado !== "activa" || d.saldo_actual <= 0) continue;
     if (d.fecha_limite) {
       const meses = mesesRestantes(hoy, d.fecha_limite, 99);

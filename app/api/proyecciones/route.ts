@@ -33,7 +33,7 @@ const schema = z.object({
 
 export async function GET() {
   try {
-    return ok(getProyecciones());
+    return ok(await getProyecciones());
   } catch (e) {
     return handleError(e);
   }
@@ -42,7 +42,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
-    return ok(crearProyeccion(body), 201);
+    return ok(await crearProyeccion(body), 201);
   } catch (e) {
     return handleError(e);
   }

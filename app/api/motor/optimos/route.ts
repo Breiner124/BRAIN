@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const resultado = motor();
+    const resultado = await motor();
     return ok({
       ...resultado,
       escenarios: getEscenarios(),

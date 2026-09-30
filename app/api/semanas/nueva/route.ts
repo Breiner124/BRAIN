@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
-    return ok(iniciarNuevaSemana(), 201);
+    return ok(await iniciarNuevaSemana(), 201);
   } catch (e) {
     return handleError(e);
   }

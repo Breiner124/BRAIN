@@ -12,7 +12,7 @@ export async function POST(
 ) {
   try {
     const { monto } = schema.parse(await req.json());
-    return ok(abonarDeuda(params.id, monto));
+    return ok(await abonarDeuda(params.id, monto));
   } catch (e) {
     return handleError(e);
   }

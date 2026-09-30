@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     const desde = searchParams.get("desde");
     const hasta = searchParams.get("hasta");
     const fuente = searchParams.get("fuente");
-    let ingresos = getIngresos();
+    let ingresos = await getIngresos();
     if (fuente) ingresos = ingresos.filter((i) => i.fuente === fuente);
     if (desde) ingresos = ingresos.filter((i) => i.fecha >= desde);
     if (hasta) ingresos = ingresos.filter((i) => i.fecha <= hasta);
@@ -37,7 +37,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = schema.parse(await req.json());
-    const ingreso = crearIngreso(body);
+    const ingreso = await crearIngreso(body);
     return ok(ingreso, 201);
   } catch (e) {
     return handleError(e);

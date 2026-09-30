@@ -9,10 +9,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default function YoPage() {
-  const semana = getSemanaActiva();
-  const tareas = semana ? getTareas(semana.id) : [];
-  const reuniones = getReuniones();
+export default async function YoPage() {
+  const [semana, reuniones] = await Promise.all([getSemanaActiva(), getReuniones()]);
+  const tareas = semana ? await getTareas(semana.id) : [];
 
   return (
     <NodeShell
