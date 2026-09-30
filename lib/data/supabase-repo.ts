@@ -19,6 +19,7 @@ import type {
   UnidadNegocio,
 } from "@/lib/types";
 import type {
+  NuevaDeuda,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
@@ -191,6 +192,67 @@ export async function pagarDeudaTotal(
       monto,
     });
   return { deuda: deudaAct, movimiento };
+}
+
+export async function crearDeuda(data: NuevaDeuda): Promise<Deuda> {
+  const uid = cerebroUserId();
+  const row = {
+    user_id: uid,
+    nombre: data.nombre,
+    categoria: data.categoria,
+    nivel_importancia: data.nivel_importancia,
+    monto_original: data.monto_original,
+    saldo_actual: data.saldo_actual ?? data.monto_original,
+    tasa_interes: data.tasa_interes ?? null,
+    fecha_limite: data.fecha_limite ?? null,
+    estado: "activa",
+  };
+  const res = await admin().from("deudas").insert(row).select("*").single();
+  return ok(res) as Deuda;
+}
+
+export async function eliminarDeuda(deuda_id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  // borra movimientos hijos primero (por la FK)
+  await admin().from("deuda_movimientos").delete().eq("deuda_id", deuda_id);
+  const res = await admin()
+    .from("deudas")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", deuda_id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id: deuda_id };
+}
+
+export async function actualizarEstadoProyeccion(
+  proyeccion_id: string,
+  estado: Proyeccion["estado"]
+): Promise<Proyeccion> {
+  const res = await admin()
+    .from("proyecciones")
+    .update({ estado })
+    .eq("id", proyeccion_id)
+    .select("*")
+    .single();
+  const p = ok(res) as Proyeccion | null;
+  if (!p) throw new Error("Proyección no encontrada");
+  return p;
+}
+
+export async function eliminarProyeccion(proyeccion_id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  // desvincula ingresos que apunten a esta proyección
+  await admin()
+    .from("ingresos")
+    .update({ proyeccion_id: null })
+    .eq("proyeccion_id", proyeccion_id);
+  const res = await admin()
+    .from("proyecciones")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", proyeccion_id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id: proyeccion_id };
 }
 
 export async function aportarMeta(meta_id: string, monto: number): Promise<Meta> {

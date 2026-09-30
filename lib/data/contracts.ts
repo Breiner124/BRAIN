@@ -1,5 +1,15 @@
 // ── Contratos de entrada compartidos por ambos backends ────────────
-import type { Egreso, FuenteIngreso, OrigenRegistro, Proyeccion, Reunion, Tarea } from "@/lib/types";
+import type { Deuda, Egreso, FuenteIngreso, OrigenRegistro, Proyeccion, Reunion, Tarea } from "@/lib/types";
+
+export interface NuevaDeuda {
+  nombre: string;
+  categoria: Deuda["categoria"];
+  nivel_importancia: number;
+  monto_original: number;
+  saldo_actual?: number;
+  tasa_interes?: number | null;
+  fecha_limite?: string | null;
+}
 
 export interface NuevoIngreso {
   unidad_id?: string | null;

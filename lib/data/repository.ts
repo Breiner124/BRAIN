@@ -24,6 +24,7 @@ import type {
   UnidadNegocio,
 } from "@/lib/types";
 import type {
+  NuevaDeuda,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
@@ -37,6 +38,7 @@ const SB = () => usarSupabase();
 
 // Reexporta los contratos para las rutas/UI que los usaban desde aquí.
 export type {
+  NuevaDeuda,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
@@ -88,6 +90,19 @@ export const pagarDeudaTotal = (deuda_id: string) =>
   SB() ? sb.pagarDeudaTotal(deuda_id) : Promise.resolve(mem.pagarDeudaTotal(deuda_id));
 export const aportarMeta = (meta_id: string, monto: number): Promise<Meta> =>
   SB() ? sb.aportarMeta(meta_id, monto) : Promise.resolve(mem.aportarMeta(meta_id, monto));
+export const crearDeuda = (data: NuevaDeuda): Promise<Deuda> =>
+  SB() ? sb.crearDeuda(data) : Promise.resolve(mem.crearDeuda(data));
+export const eliminarDeuda = (deuda_id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarDeuda(deuda_id) : Promise.resolve(mem.eliminarDeuda(deuda_id));
+export const actualizarEstadoProyeccion = (
+  id: string,
+  estado: Proyeccion["estado"]
+): Promise<Proyeccion> =>
+  SB()
+    ? sb.actualizarEstadoProyeccion(id, estado)
+    : Promise.resolve(mem.actualizarEstadoProyeccion(id, estado));
+export const eliminarProyeccion = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarProyeccion(id) : Promise.resolve(mem.eliminarProyeccion(id));
 export const crearProyeccion = (data: NuevaProyeccion) =>
   SB() ? sb.crearProyeccion(data) : Promise.resolve(mem.crearProyeccion(data));
 export const aportarProyeccion = (id: string, monto: number): Promise<Proyeccion> =>

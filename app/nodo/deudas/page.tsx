@@ -1,6 +1,7 @@
 import { NodeShell } from "@/components/NodeShell";
 import { Card } from "@/components/ui/Card";
 import { DebtCard } from "@/components/finance/DebtCard";
+import { AddDebtForm } from "@/components/finance/AddDebtForm";
 import { getDeudas } from "@/lib/data/repository";
 import { formatCOP } from "@/lib/format";
 
@@ -30,8 +31,14 @@ export default async function DeudasPage() {
         </div>
       </Card>
 
+      <div className="mb-5">
+        <AddDebtForm />
+      </div>
+
       {deudas.length === 0 ? (
-        <p className="text-sm text-muted">No hay deudas registradas.</p>
+        <p className="text-sm text-muted">
+          No hay deudas registradas. Usa &ldquo;Agregar deuda&rdquo; para crear la primera.
+        </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {deudas.map((d) => (

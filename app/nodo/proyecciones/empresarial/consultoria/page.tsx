@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { NodeShell } from "@/components/NodeShell";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { ProgressBar } from "@/components/finance/ProgressBar";
 import { IncomeQuickAdd } from "@/components/finance/IncomeQuickAdd";
 import { ProjectionForm } from "@/components/finance/ProjectionForm";
+import { ProjectionControls } from "@/components/finance/ProjectionControls";
 import { getIngresos, getProyecciones, getUnidades } from "@/lib/data/repository";
 import { formatCOP } from "@/lib/format";
 
@@ -100,13 +100,13 @@ export default async function ConsultoriaPage() {
                         <p className="text-xs text-muted">{p.fecha_objetivo}</p>
                       )}
                     </div>
-                    <div className="text-right">
+                    <div className="flex flex-col items-end gap-1">
                       {p.facturacion_esperada ? (
                         <p className="font-bold text-fg">
                           {formatCOP(p.facturacion_esperada)}
                         </p>
                       ) : null}
-                      <Badge>{p.estado}</Badge>
+                      <ProjectionControls p={p} />
                     </div>
                   </li>
                 ))}

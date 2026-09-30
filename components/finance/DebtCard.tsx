@@ -28,12 +28,12 @@ export function DebtCard({ deuda }: { deuda: Deuda }) {
   const montoNum = Number(monto.replace(/\D/g, ""));
   const pagada = deuda.estado === "pagada";
 
-  async function accion(url: string, body?: object) {
+  async function accion(url: string, body?: object, metodo: "POST" | "DELETE" = "POST") {
     setBusy(true);
     setError(null);
     try {
       const res = await fetch(url, {
-        method: "POST",
+        method: metodo,
         headers: { "Content-Type": "application/json" },
         body: body ? JSON.stringify(body) : undefined,
       });
@@ -73,21 +73,35 @@ export function DebtCard({ deuda }: { deuda: Deuda }) {
         label="Pagado"
       />
 
-      {!pagada && (
-        <div className="mt-4 flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setAbrirAbono(true)}>
-            Abonar
-          </Button>
-          <Button
-            size="sm"
-            variant="danger"
-            onClick={() => accion(`/api/deudas/${deuda.id}/pagar-total`)}
-            disabled={busy}
-          >
-            Pagar en totalidad
-          </Button>
-        </div>
-      )}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {!pagada && (
+          <>
+            <Button size="sm" variant="outline" onClick={() => setAbrirAbono(true)}>
+              Abonar
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => accion(`/api/deudas/${deuda.id}/pagar-total`)}
+              disabled={busy}
+            >
+              Pagar en totalidad
+            </Button>
+          </>
+        )}
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => {
+            if (confirm(`¿Eliminar la deuda "${deuda.nombre}"?`))
+              accion(`/api/deudas/${deuda.id}`, undefined, "DELETE");
+          }}
+          disabled={busy}
+        >
+          Eliminar
+        </Button>
+      </div>
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
 
       <Modal
         open={abrirAbono}

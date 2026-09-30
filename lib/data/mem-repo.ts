@@ -16,6 +16,7 @@ import type {
   Tarea,
 } from "@/lib/types";
 import type {
+  NuevaDeuda,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
@@ -116,6 +117,29 @@ export function pagarDeudaTotal(
   return { deuda, movimiento };
 }
 
+export function crearDeuda(data: NuevaDeuda): Deuda {
+  const deuda: Deuda = {
+    id: uid("deu"),
+    nombre: data.nombre,
+    categoria: data.categoria,
+    nivel_importancia: data.nivel_importancia,
+    monto_original: data.monto_original,
+    saldo_actual: data.saldo_actual ?? data.monto_original,
+    tasa_interes: data.tasa_interes ?? null,
+    fecha_limite: data.fecha_limite ?? null,
+    estado: "activa",
+  };
+  db().deudas.push(deuda);
+  return deuda;
+}
+
+export function eliminarDeuda(deuda_id: string): { id: string } {
+  const idx = db().deudas.findIndex((d) => d.id === deuda_id);
+  if (idx === -1) throw new Error("Deuda no encontrada");
+  db().deudas.splice(idx, 1);
+  return { id: deuda_id };
+}
+
 export function aportarMeta(meta_id: string, monto: number): Meta {
   const meta = db().metas.find((m) => m.id === meta_id);
   if (!meta) throw new Error("Meta no encontrada");
@@ -172,6 +196,23 @@ export function aportarProyeccion(proyeccion_id: string, monto: number): Proyecc
   if (objetivo > 0 && (p.avance ?? 0) >= objetivo) p.estado = "lograda";
   else if ((p.avance ?? 0) > 0) p.estado = "en_progreso";
   return p;
+}
+
+export function actualizarEstadoProyeccion(
+  proyeccion_id: string,
+  estado: Proyeccion["estado"]
+): Proyeccion {
+  const p = db().proyecciones.find((x) => x.id === proyeccion_id);
+  if (!p) throw new Error("Proyección no encontrada");
+  p.estado = estado;
+  return p;
+}
+
+export function eliminarProyeccion(proyeccion_id: string): { id: string } {
+  const idx = db().proyecciones.findIndex((p) => p.id === proyeccion_id);
+  if (idx === -1) throw new Error("Proyección no encontrada");
+  db().proyecciones.splice(idx, 1);
+  return { id: proyeccion_id };
 }
 
 export function crearTarea(data: NuevaTarea): Tarea {

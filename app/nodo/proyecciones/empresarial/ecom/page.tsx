@@ -2,9 +2,9 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { NodeShell } from "@/components/NodeShell";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { IncomeQuickAdd } from "@/components/finance/IncomeQuickAdd";
 import { ProjectionForm } from "@/components/finance/ProjectionForm";
+import { ProjectionControls } from "@/components/finance/ProjectionControls";
 import { ScenarioSlider } from "@/components/finance/ScenarioSlider";
 import {
   getEscenarios,
@@ -95,7 +95,7 @@ export default async function EcomPage() {
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold text-fg">{p.nombre}</p>
-                      <Badge>{p.estado}</Badge>
+                      <ProjectionControls p={p} />
                     </div>
                     {p.costo_recurrente ? (
                       <p className="mt-1 text-xs text-muted">
@@ -118,25 +118,39 @@ export default async function EcomPage() {
             )}
           </Card>
 
-          {proyecciones.filter((p) => p.tipo === "ingreso_esperado").length > 0 && (
-            <Card className="mt-5">
-              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                Facturación esperada
+          <Card className="mt-5">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
+              Todas las proyecciones de e-com ({proyecciones.length})
+            </p>
+            {proyecciones.length === 0 ? (
+              <p className="text-sm text-muted">
+                Aún no has creado proyecciones de e-com. Usa el formulario de la izquierda.
               </p>
-              <ul className="space-y-2">
-                {proyecciones
-                  .filter((p) => p.tipo === "ingreso_esperado")
-                  .map((p) => (
-                    <li key={p.id} className="flex justify-between text-sm">
-                      <span className="text-fg">{p.nombre}</span>
-                      <span className="font-semibold text-fg">
-                        {formatCOP(p.facturacion_esperada ?? 0)}/mes
-                      </span>
-                    </li>
-                  ))}
+            ) : (
+              <ul className="space-y-3">
+                {proyecciones.map((p) => (
+                  <li
+                    key={p.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 p-3"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-fg">{p.nombre}</p>
+                      <p className="text-xs text-muted">
+                        {p.tipo === "ingreso_esperado"
+                          ? `${formatCOP(p.facturacion_esperada ?? 0)}/mes`
+                          : p.costo_recurrente
+                          ? `Costo ${formatCOP(p.costo_recurrente)}/mes`
+                          : p.costo_estimado
+                          ? `Inversión ${formatCOP(p.costo_estimado)}`
+                          : p.tipo}
+                      </p>
+                    </div>
+                    <ProjectionControls p={p} />
+                  </li>
+                ))}
               </ul>
-            </Card>
-          )}
+            )}
+          </Card>
         </div>
       </div>
     </NodeShell>
