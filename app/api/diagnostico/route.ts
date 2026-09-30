@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { admin, usarSupabase, cerebroUserId } from "@/lib/supabase/admin";
+import { crearIngreso, getIngresos } from "@/lib/data/repository";
 
 export const dynamic = "force-dynamic";
 
@@ -69,5 +70,30 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({ modo, env, prueba, escritura }, { status: 200 });
+  // Prueba por la MISMA ruta que usa la app (repositorio con gate SB).
+  const escrituraApp: Record<string, unknown> = { intentado: false };
+  if (usarSupabase()) {
+    escrituraApp.intentado = true;
+    try {
+      const ing = await crearIngreso({
+        fuente: "otros",
+        descripcion: "__diag_app__",
+        monto: 99999,
+      });
+      const todos = await getIngresos();
+      escrituraApp.creado_id = ing.id;
+      escrituraApp.total_ingresos = todos.length;
+      escrituraApp.se_lee_de_vuelta = todos.some((i) => i.id === ing.id);
+      escrituraApp.error = null;
+      // limpieza
+      await admin().from("ingresos").delete().eq("id", ing.id);
+    } catch (e) {
+      escrituraApp.error = e instanceof Error ? e.message : "error desconocido";
+    }
+  }
+
+  return NextResponse.json(
+    { modo, env, prueba, escritura, escrituraApp },
+    { status: 200 }
+  );
 }
