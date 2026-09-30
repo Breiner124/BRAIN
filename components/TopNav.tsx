@@ -3,6 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AlertsBell } from "@/components/AlertsBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const LINKS = [
   { href: "/", label: "Cerebro" },
@@ -11,6 +13,7 @@ const LINKS = [
   { href: "/nodo/deudas", label: "Deudas" },
   { href: "/nodo/proyecciones", label: "Proyecciones" },
   { href: "/nodo/yo", label: "Yo" },
+  { href: "/nodo/reportes", label: "Reportes" },
 ];
 
 export function TopNav() {
@@ -40,6 +43,10 @@ export function TopNav() {
           );
         })}
       </nav>
+      <div className="ml-auto flex shrink-0 items-center gap-1 pl-2">
+        <AlertsBell />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }

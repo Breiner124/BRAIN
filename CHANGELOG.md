@@ -2,6 +2,28 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es/).
 
+## [0.3.0] — Fase 3: Integraciones y pulido — 2026-09-30
+
+### Added
+- **Calendly (§14) real**: `/api/webhooks/calendly` con **verificación de firma**
+  (HMAC-SHA256 + anti-replay) que inserta reuniones `fuente='calendly'` sin duplicar
+  (`upsertReunionCalendly`). Módulo `/lib/calendar/calendly.ts` (parseo + helper para
+  registrar la suscripción). Tag de ámbito vía `?ambito=consultoria|ecom`.
+- **Google Calendar**: stub `/lib/calendar/google.ts` (opcional, marcado como TODO).
+- **Reportes** (`/nodo/reportes`): gráficas Recharts (ingresos por fuente y flujo de caja
+  a 6 meses), tarjetas de totales y **exportables CSV** (`/api/export/ingresos`,
+  `/api/export/egresos`) con BOM UTF-8 para Excel.
+- **Notificaciones**: alertas derivadas del estado (`/lib/alertas.ts`,
+  `/api/alertas`) — semáforo, deudas por vencer, metas cerca, excedente disponible —
+  con **campana en el TopNav** (`AlertsBell`).
+- **Toggle de tema** claro/oscuro (`ThemeToggle`) persistido en localStorage.
+- **12 tests nuevos** (reportes + firma/parseo Calendly): total **38 tests** en verde.
+
+### Added — Supabase turnkey
+- `/db/policies.sql`: políticas RLS por tabla (un solo usuario).
+- `/db/seed.sql`: ahora crea también las **conexiones** del grafo automáticamente.
+- Variables `CALENDLY_WEBHOOK_SIGNING_KEY` / `CALENDLY_TOKEN` en `.env.example`.
+
 ## [0.2.0] — Fase 2: Proyecciones y profundidad — 2026-09-30
 
 ### Added

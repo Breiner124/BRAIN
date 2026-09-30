@@ -8,7 +8,7 @@ Plataforma personal de vida, finanzas, proyecciones y ganancias, visualizada com
 
 ---
 
-## ✅ Estado — Fases 1 y 2 completas
+## ✅ Estado — Fases 1, 2 y 3 completas
 
 | Módulo | Estado |
 |---|---|
@@ -16,16 +16,17 @@ Plataforma personal de vida, finanzas, proyecciones y ganancias, visualizada com
 | Nodo **Ganancias**: alta rápida + bandeja unificada + cruce + óptimos + excedente | ✅ |
 | Nodo **Deudas**: abonar / pagar en totalidad, ordenadas por importancia | ✅ |
 | Nodo **Metas**: barras de progreso + aportar + "cuánto apartar/mes" | ✅ |
-| Nodo **Proyecciones Personales**: crear + barra de avance + aportar | ✅ |
-| Nodo **Proyección Empresarial**: Consultoría + E-com con **flujo bidireccional** | ✅ |
-| Escenarios §9 (ScenarioSlider) + ROI de expansión §6.7 | ✅ |
+| Nodo **Proyecciones Personales + Empresarial** con **flujo bidireccional** | ✅ |
 | Nodo **Yo** completo: semana por ámbito + arrastre de tareas + reuniones | ✅ |
-| **Motor Financiero** (§6.2–6.8) puro + **26 tests Vitest** | ✅ |
-| API route handlers (§11) | ✅ |
-| Esquema Supabase (`/db/schema.sql`) + seed (`/db/seed.sql`) | ✅ |
+| **Reportes**: gráficas (Recharts) + exportables CSV | ✅ |
+| **Calendly** (§14): webhook con firma → reuniones | ✅ |
+| **Notificaciones** (campana) + toggle de tema claro/oscuro | ✅ |
+| **Motor Financiero** (§6.2–6.8) puro + **38 tests Vitest** | ✅ |
+| Esquema + políticas + seed Supabase (`/db/*.sql`) | ✅ |
 
-**Fase 3** (siguiente): integración Calendly (webhooks §14), Google Calendar opcional,
-reportes/exportables, notificaciones y refinamiento visual.
+**Pendiente (infra de persistencia):** el swap del repositorio en memoria por consultas
+Supabase (ver sección "Conectar Supabase"). La base de datos ya está lista con SQL
+turnkey; falta cablear las consultas en `/lib/data`.
 
 ---
 
@@ -83,29 +84,68 @@ el motor recalcular en vivo.
 
 ## 🔌 Conectar Supabase (persistencia real entre dispositivos)
 
-En Fase 1 la app usa un **store en memoria** (se reinicia en cada cold start de Vercel).
-Para persistir de verdad:
+La app usa hoy un **store en memoria** (se reinicia en cada cold start de Vercel). Estos
+pasos dejan tu base de datos 100% lista; el último paso (cablear las consultas) es el
+único código pendiente.
 
-1. Crea un proyecto en [supabase.com](https://supabase.com).
-2. En **SQL Editor**, ejecuta `/db/schema.sql`.
-3. Ejecuta `/db/seed.sql` reemplazando `:user_id` por tu uuid de `auth.users`.
-   (Las conexiones del grafo referencian los `id` de `nodos` generados — créalas después
-   de insertar los nodos.)
-4. Copia `.env.example` a `.env.local` y llena:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=...
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=...
-   NEXT_PUBLIC_DATA_SOURCE=supabase
-   ```
-5. El repositorio (`/lib/data/repository.ts`) es la **única puerta a los datos**: ahí se
-   cambia la implementación del store en memoria por consultas Supabase, sin tocar la UI
-   ni las rutas. Los clientes ya están listos en `/lib/supabase`.
+**1. Crear el proyecto**
+- Entra a [supabase.com](https://supabase.com) → **New project**. Guarda la contraseña.
+- Espera a que termine de aprovisionar (~2 min).
+
+**2. Crear las tablas** — en **SQL Editor** pega y corre, en orden:
+1. `db/schema.sql` (tablas + índices + RLS activado)
+2. `db/policies.sql` (políticas: cada quien ve solo lo suyo)
+
+**3. Crear tu usuario y sembrar datos**
+- En **Authentication → Users → Add user**, crea tu usuario (email + contraseña) y copia
+  su **UUID**.
+- En **SQL Editor**, arriba del `db/seed.sql`, define el uuid y luego corre el archivo:
+  ```sql
+  \set user_id '«pega-aquí-tu-uuid»'
+  ```
+  (Si el editor no soporta `\set`, reemplaza a mano `:'user_id'` por `'tu-uuid'`.)
+  El seed crea perfil, unidades, nodos, **conexiones**, deudas, metas y proyecciones.
+
+**4. Variables de entorno** — copia `.env.example` a `.env.local` y llena (los valores
+están en **Project Settings → API**):
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...        # solo servidor, NUNCA al cliente
+NEXT_PUBLIC_DATA_SOURCE=supabase
+```
+
+**5. Cablear las consultas (paso de código pendiente)**
+El repositorio (`/lib/data/repository.ts`) es la **única puerta a los datos**. Ahí se
+cambia el store en memoria por llamadas a Supabase (clientes ya listos en
+`/lib/supabase`). Al terminar este paso, toda la app (grafo, ganancias, metas, deudas,
+proyecciones, semana) persiste en la nube sin tocar UI ni rutas.
+
+> ¿Quieres que lo haga? Dímelo y lo implemento contra tu instancia para validarlo en vivo.
 
 ### Deploy en Vercel
+1. Conecta el repo de GitHub en Vercel (**New Project** → importar `Breiner124/BRAIN`).
+2. En **Settings → Environment Variables**, agrega las mismas variables del paso 4.
+3. Deploy automático en cada push a la rama.
 
-1. Conecta el repo de GitHub en Vercel.
-2. Agrega las mismas variables de entorno en el proyecto de Vercel.
-3. Deploy automático en cada push.
+---
+
+## 📅 Conectar Calendly (§14)
+
+1. En Vercel ten tu URL pública (ej. `https://tu-app.vercel.app`).
+2. En Calendly (**Integrations → Webhooks**, requiere plan que lo permita), crea una
+   suscripción al evento `invitee.created` apuntando a:
+   ```
+   https://tu-app.vercel.app/api/webhooks/calendly?ambito=consultoria
+   ```
+   (usa `?ambito=ecom` para reuniones con mentores).
+3. Copia la **signing key** que te da Calendly y ponla en el env
+   `CALENDLY_WEBHOOK_SIGNING_KEY`. El endpoint entonces **exige firma válida** en cada
+   webhook (HMAC-SHA256 + anti-replay). Sin esa variable, acepta sin verificar (solo dev).
+4. Cada reunión agendada aparecerá en **Nodo Yo** y se contabiliza en **Reportes**.
+
+> Alternativa por API: `crearSuscripcionWebhook()` en `/lib/calendar/calendly.ts` registra
+> el webhook usando `CALENDLY_TOKEN` (córrelo una sola vez).
 
 ---
 

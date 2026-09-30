@@ -24,7 +24,32 @@ insert into nodos (user_id, tipo, titulo, resumen, posicion_x, posicion_y, color
   (:'user_id', 'metas',        'Metas',        'BMW · China · Navidad',      0.82, 0.22, 'metas',        'target',      3),
   (:'user_id', 'ganancias',    'Ganancias',    'Centro de gravedad',         0.80, 0.78, 'ganancias',    'dollar',      4),
   (:'user_id', 'deudas',       'Deudas',       'Ordenadas por importancia',  0.20, 0.78, 'deudas',       'credit-card', 5);
--- (Las conexiones se crean referenciando los id generados; ver README.)
+-- ── Conexiones (sinapsis) referenciando los nodos recién creados ──
+do $$
+declare uid uuid := :'user_id';
+  n_central uuid; n_yo uuid; n_proy uuid; n_metas uuid; n_gan uuid; n_deu uuid;
+begin
+  select id into n_central from nodos where user_id = uid and tipo = 'central' limit 1;
+  select id into n_yo      from nodos where user_id = uid and tipo = 'yo' limit 1;
+  select id into n_proy    from nodos where user_id = uid and tipo = 'proyecciones' limit 1;
+  select id into n_metas   from nodos where user_id = uid and tipo = 'metas' limit 1;
+  select id into n_gan     from nodos where user_id = uid and tipo = 'ganancias' limit 1;
+  select id into n_deu     from nodos where user_id = uid and tipo = 'deudas' limit 1;
+
+  insert into conexiones (user_id, origen_id, destino_id, tipo_flujo, activa) values
+    (uid, n_gan,  n_proy,  'financiero', true),
+    (uid, n_gan,  n_metas, 'financiero', true),
+    (uid, n_gan,  n_deu,   'financiero', true),
+    (uid, n_proy, n_gan,   'financiero', true),
+    (uid, n_proy, n_metas, 'informativo', true),
+    (uid, n_yo,   n_metas, 'tarea', true),
+    (uid, n_yo,   n_proy,  'tarea', true),
+    (uid, n_central, n_yo,    'informativo', true),
+    (uid, n_central, n_proy,  'informativo', true),
+    (uid, n_central, n_metas, 'informativo', true),
+    (uid, n_central, n_gan,   'informativo', true),
+    (uid, n_central, n_deu,   'informativo', true);
+end$$;
 
 -- ── Deudas: Computador $150.000 (credito_fijo, importancia 3) ─────
 insert into deudas (user_id, nombre, categoria, nivel_importancia, monto_original, saldo_actual, estado)

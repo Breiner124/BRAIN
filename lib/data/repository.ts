@@ -334,6 +334,41 @@ export function crearReunion(data: NuevaReunion): Reunion {
   return reunion;
 }
 
+export interface ReunionCalendly {
+  ambito: Reunion["ambito"];
+  titulo: string;
+  con_quien?: string;
+  inicio: string;
+  fin?: string | null;
+  calendly_event_id: string | null;
+}
+
+/** Inserta (o actualiza) una reunión venida de Calendly, sin duplicar. */
+export function upsertReunionCalendly(data: ReunionCalendly): Reunion {
+  const existente = data.calendly_event_id
+    ? db().reuniones.find((r) => r.calendly_event_id === data.calendly_event_id)
+    : undefined;
+  if (existente) {
+    existente.titulo = data.titulo;
+    existente.con_quien = data.con_quien;
+    existente.inicio = data.inicio;
+    existente.fin = data.fin ?? null;
+    return existente;
+  }
+  const reunion: Reunion = {
+    id: uid("reu"),
+    ambito: data.ambito,
+    titulo: data.titulo,
+    con_quien: data.con_quien,
+    inicio: data.inicio,
+    fin: data.fin ?? null,
+    fuente: "calendly",
+    calendly_event_id: data.calendly_event_id,
+  };
+  db().reuniones.push(reunion);
+  return reunion;
+}
+
 // ── Ensamble de entrada del motor + corrida ────────────────────────
 export function engineInput(hoy = new Date()): EngineInput {
   const profile = getProfile();
