@@ -87,8 +87,8 @@ export function PeekPanel({ nodo, resumen, onClose }: Props) {
               )}
               {tipo === "testeos" && (
                 <p className="text-sm text-muted">
-                  Programa testeos de producto, guarda lo que dicen tus mentores y anota
-                  tus tareas fundamentales. Abre el tablero para gestionarlo.
+                  Programación semanal de la empresa: agrega tus productos/actividades,
+                  guarda lo que dicen tus mentores y anota tus tareas. Abre el tablero.
                 </p>
               )}
             </div>

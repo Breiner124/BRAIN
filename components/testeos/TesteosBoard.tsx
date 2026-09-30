@@ -70,7 +70,7 @@ export function TesteosBoard({
           <div className="mb-3 flex items-center gap-2">
             <FlaskConical size={18} className="text-testeos" />
             <p className="text-sm font-semibold uppercase tracking-wide text-muted">
-              Programar testeo
+              Agregar producto / actividad
             </p>
           </div>
           <NuevoTesteoForm onCreate={(b) => call("/api/testeos", "POST", b)} busy={busy} />
@@ -79,7 +79,7 @@ export function TesteosBoard({
         {testeos.length === 0 ? (
           <Card>
             <p className="text-sm text-muted">
-              Aún no hay testeos. Programa el primero (producto + cuándo testearlo).
+              Aún no hay productos/actividades. Agrega el primero (producto + cuándo).
             </p>
           </Card>
         ) : (
@@ -196,7 +196,7 @@ function NuevoTesteoForm({
         />
       </div>
       <Button type="submit" className="w-full" disabled={busy} style={{ background: "var(--c-testeos)" }}>
-        <Plus size={16} /> Programar testeo
+        <Plus size={16} /> Agregar a la programación
       </Button>
     </form>
   );
@@ -256,7 +256,7 @@ function TesteoCard({
           </button>
           <button
             onClick={() => {
-              if (confirm(`¿Eliminar el testeo de "${t.producto}"?`))
+              if (confirm(`¿Eliminar "${t.producto}"?`))
                 call(`/api/testeos/${t.id}`, "DELETE");
             }}
             className="rounded-lg p-1.5 text-muted hover:bg-surface-2 hover:text-danger"
@@ -285,7 +285,7 @@ function TesteoCard({
         </div>
       )}
 
-      <Modal open={editar} onClose={() => setEditar(false)} title={`Testeo: ${t.producto}`}>
+      <Modal open={editar} onClose={() => setEditar(false)} title={t.producto}>
         <div className="space-y-4 text-left">
           <div>
             <Label>¿Cuándo testear?</Label>

@@ -13,7 +13,7 @@ const LINKS = [
   { href: "/nodo/deudas", label: "Deudas" },
   { href: "/nodo/proyecciones", label: "Proyecciones" },
   { href: "/nodo/yo", label: "Yo" },
-  { href: "/nodo/testeos", label: "Testeos" },
+  { href: "/nodo/testeos", label: "Programación" },
   { href: "/nodo/reportes", label: "Reportes" },
 ];
 

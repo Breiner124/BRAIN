@@ -10,8 +10,8 @@ export default async function TesteosPage() {
   return (
     <NodeShell
       tipo="testeos"
-      titulo="Testeos"
-      descripcion="Programa testeos de producto y guarda lo que dicen tus mentores, ideas y tareas."
+      titulo="Programación Semanal · La Empresa"
+      descripcion="Programa tus productos/actividades y guarda lo que dicen tus mentores, ideas y tareas."
     >
       <TesteosBoard testeos={testeos} notas={notas} />
     </NodeShell>

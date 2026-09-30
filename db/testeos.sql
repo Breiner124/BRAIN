@@ -57,7 +57,7 @@ begin
   end if;
 
   insert into nodos (user_id, tipo, titulo, resumen, posicion_x, posicion_y, color, icono, orden)
-  values (uid, 'testeos', 'Testeos', 'Programación de testeos + notas', 0.5, 0.9, 'testeos', 'flask', 6)
+  values (uid, 'testeos', 'Programación Semanal', 'La empresa: productos + notas', 0.5, 0.9, 'testeos', 'flask', 6)
   returning id into n_testeos;
 
   insert into conexiones (user_id, origen_id, destino_id, tipo_flujo, activa) values
