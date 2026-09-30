@@ -11,22 +11,28 @@ import type {
   Ingreso,
   Meta,
   Nodo,
+  Nota,
   Profile,
   Proyeccion,
   Reunion,
   Semana,
   Tarea,
+  Testeo,
   UnidadNegocio,
 } from "@/lib/types";
 import type {
+  NotaPatch,
   NuevaDeuda,
+  NuevaNota,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  NuevoTesteo,
   ProyeccionPatch,
   ReunionCalendly,
+  TesteoPatch,
 } from "@/lib/data/contracts";
 
 function hoyISO() {
@@ -63,6 +69,8 @@ export const getMetas = () => lista<Meta>("metas", "prioridad");
 export const getProyecciones = () => lista<Proyeccion>("proyecciones", "created_at", false);
 export const getSemanas = () => lista<Semana>("semanas", "fecha_inicio", false);
 export const getReuniones = () => lista<Reunion>("reuniones", "inicio");
+export const getTesteos = () => lista<Testeo>("testeos", "prioridad");
+export const getNotas = () => lista<Nota>("notas", "fecha", false);
 
 export async function getSemanaActiva(): Promise<Semana | undefined> {
   const uid = cerebroUserId();
@@ -510,6 +518,72 @@ export async function crearReunion(data: NuevaReunion): Promise<Reunion> {
   };
   const res = await admin().from("reuniones").insert(row).select("*").single();
   return ok(res) as Reunion;
+}
+
+// ── Testeos ────────────────────────────────────────────────────────
+export async function crearTesteo(data: NuevoTesteo): Promise<Testeo> {
+  const uid = cerebroUserId();
+  const row = {
+    user_id: uid,
+    producto: data.producto,
+    hipotesis: data.hipotesis ?? null,
+    fecha_testeo: data.fecha_testeo ?? null,
+    estado: "planificado",
+    prioridad: data.prioridad ?? 3,
+    presupuesto: data.presupuesto ?? null,
+    notas: data.notas ?? null,
+    resultado: null,
+  };
+  const res = await admin().from("testeos").insert(row).select("*").single();
+  return ok(res) as Testeo;
+}
+
+export async function actualizarTesteo(id: string, patch: TesteoPatch): Promise<Testeo> {
+  const res = await admin()
+    .from("testeos")
+    .update(patch)
+    .eq("id", id)
+    .select("*")
+    .single();
+  const t = ok(res) as Testeo | null;
+  if (!t) throw new Error("Testeo no encontrado");
+  return t;
+}
+
+export async function eliminarTesteo(id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  const res = await admin().from("testeos").delete().eq("user_id", uid).eq("id", id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id };
+}
+
+// ── Notas ──────────────────────────────────────────────────────────
+export async function crearNota(data: NuevaNota): Promise<Nota> {
+  const uid = cerebroUserId();
+  const row = {
+    user_id: uid,
+    fecha: data.fecha ?? new Date().toISOString().slice(0, 10),
+    categoria: data.categoria ?? "general",
+    contenido: data.contenido,
+    fuente: data.fuente ?? null,
+    hecha: false,
+  };
+  const res = await admin().from("notas").insert(row).select("*").single();
+  return ok(res) as Nota;
+}
+
+export async function actualizarNota(id: string, patch: NotaPatch): Promise<Nota> {
+  const res = await admin().from("notas").update(patch).eq("id", id).select("*").single();
+  const n = ok(res) as Nota | null;
+  if (!n) throw new Error("Nota no encontrada");
+  return n;
+}
+
+export async function eliminarNota(id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  const res = await admin().from("notas").delete().eq("user_id", uid).eq("id", id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id };
 }
 
 export async function upsertReunionCalendly(data: ReunionCalendly): Promise<Reunion> {

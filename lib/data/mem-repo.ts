@@ -9,21 +9,27 @@ import type {
   Egreso,
   Ingreso,
   Meta,
+  Nota,
   OrigenRegistro,
   Proyeccion,
   Reunion,
   Semana,
   Tarea,
+  Testeo,
 } from "@/lib/types";
 import type {
+  NotaPatch,
   NuevaDeuda,
+  NuevaNota,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  NuevoTesteo,
   ProyeccionPatch,
   ReunionCalendly,
+  TesteoPatch,
 } from "@/lib/data/contracts";
 
 export const getProfile = () => db().profile;
@@ -319,6 +325,71 @@ export function eliminarReunion(reunion_id: string): { id: string } {
   if (idx === -1) throw new Error("Reunión no encontrada");
   db().reuniones.splice(idx, 1);
   return { id: reunion_id };
+}
+
+// ── Testeos ────────────────────────────────────────────────────────
+export const getTesteos = () => db().testeos;
+
+export function crearTesteo(data: NuevoTesteo): Testeo {
+  const testeo: Testeo = {
+    id: uid("test"),
+    producto: data.producto,
+    hipotesis: data.hipotesis ?? null,
+    fecha_testeo: data.fecha_testeo ?? null,
+    estado: "planificado",
+    prioridad: data.prioridad ?? 3,
+    presupuesto: data.presupuesto ?? null,
+    notas: data.notas ?? null,
+    resultado: null,
+    created_at: new Date().toISOString(),
+  };
+  db().testeos.unshift(testeo);
+  return testeo;
+}
+
+export function actualizarTesteo(id: string, patch: TesteoPatch): Testeo {
+  const t = db().testeos.find((x) => x.id === id);
+  if (!t) throw new Error("Testeo no encontrado");
+  Object.assign(t, patch);
+  return t;
+}
+
+export function eliminarTesteo(id: string): { id: string } {
+  const idx = db().testeos.findIndex((t) => t.id === id);
+  if (idx === -1) throw new Error("Testeo no encontrado");
+  db().testeos.splice(idx, 1);
+  return { id };
+}
+
+// ── Notas (bloc de notas con fechas) ───────────────────────────────
+export const getNotas = () => db().notas;
+
+export function crearNota(data: NuevaNota): Nota {
+  const nota: Nota = {
+    id: uid("nota"),
+    fecha: data.fecha ?? todayISO(),
+    categoria: data.categoria ?? "general",
+    contenido: data.contenido,
+    fuente: data.fuente ?? null,
+    hecha: false,
+    created_at: new Date().toISOString(),
+  };
+  db().notas.unshift(nota);
+  return nota;
+}
+
+export function actualizarNota(id: string, patch: NotaPatch): Nota {
+  const n = db().notas.find((x) => x.id === id);
+  if (!n) throw new Error("Nota no encontrada");
+  Object.assign(n, patch);
+  return n;
+}
+
+export function eliminarNota(id: string): { id: string } {
+  const idx = db().notas.findIndex((n) => n.id === id);
+  if (idx === -1) throw new Error("Nota no encontrada");
+  db().notas.splice(idx, 1);
+  return { id };
 }
 
 export function upsertReunionCalendly(data: ReunionCalendly): Reunion {

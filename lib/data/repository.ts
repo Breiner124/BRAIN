@@ -16,22 +16,28 @@ import type {
   Ingreso,
   Meta,
   Nodo,
+  Nota,
   Profile,
   Proyeccion,
   Reunion,
   Semana,
   Tarea,
+  Testeo,
   UnidadNegocio,
 } from "@/lib/types";
 import type {
+  NotaPatch,
   NuevaDeuda,
+  NuevaNota,
   NuevaProyeccion,
   NuevaReunion,
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  NuevoTesteo,
   ProyeccionPatch,
   ReunionCalendly,
+  TesteoPatch,
 } from "@/lib/data/contracts";
 import { correrMotor, facturacionDiariaPromedio, type EngineInput } from "@/lib/engine";
 
@@ -78,6 +84,10 @@ export const getTareas = (semana_id?: string): Promise<Tarea[]> =>
   SB() ? sb.getTareas(semana_id) : Promise.resolve(mem.getTareas(semana_id));
 export const getReuniones = (): Promise<Reunion[]> =>
   SB() ? sb.getReuniones() : Promise.resolve(mem.getReuniones());
+export const getTesteos = (): Promise<Testeo[]> =>
+  SB() ? sb.getTesteos() : Promise.resolve(mem.getTesteos());
+export const getNotas = (): Promise<Nota[]> =>
+  SB() ? sb.getNotas() : Promise.resolve(mem.getNotas());
 export const getDeudaMovimientos = (deuda_id?: string): Promise<DeudaMovimiento[]> =>
   SB() ? sb.getDeudaMovimientos(deuda_id) : Promise.resolve(mem.getDeudaMovimientos(deuda_id));
 
@@ -97,6 +107,18 @@ export const eliminarMeta = (id: string): Promise<{ id: string }> =>
   SB() ? sb.eliminarMeta(id) : Promise.resolve(mem.eliminarMeta(id));
 export const eliminarReunion = (id: string): Promise<{ id: string }> =>
   SB() ? sb.eliminarReunion(id) : Promise.resolve(mem.eliminarReunion(id));
+export const crearTesteo = (data: NuevoTesteo): Promise<Testeo> =>
+  SB() ? sb.crearTesteo(data) : Promise.resolve(mem.crearTesteo(data));
+export const actualizarTesteo = (id: string, patch: TesteoPatch): Promise<Testeo> =>
+  SB() ? sb.actualizarTesteo(id, patch) : Promise.resolve(mem.actualizarTesteo(id, patch));
+export const eliminarTesteo = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarTesteo(id) : Promise.resolve(mem.eliminarTesteo(id));
+export const crearNota = (data: NuevaNota): Promise<Nota> =>
+  SB() ? sb.crearNota(data) : Promise.resolve(mem.crearNota(data));
+export const actualizarNota = (id: string, patch: NotaPatch): Promise<Nota> =>
+  SB() ? sb.actualizarNota(id, patch) : Promise.resolve(mem.actualizarNota(id, patch));
+export const eliminarNota = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarNota(id) : Promise.resolve(mem.eliminarNota(id));
 export const abonarDeuda = (deuda_id: string, monto: number) =>
   SB() ? sb.abonarDeuda(deuda_id, monto) : Promise.resolve(mem.abonarDeuda(deuda_id, monto));
 export const pagarDeudaTotal = (deuda_id: string) =>

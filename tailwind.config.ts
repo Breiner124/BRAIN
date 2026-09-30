@@ -23,6 +23,7 @@ const config: Config = {
         metas: "var(--c-metas)",
         ganancias: "var(--c-ganancias)",
         deudas: "var(--c-deudas)",
+        testeos: "var(--c-testeos)",
         ok: "var(--c-ok)",
         warn: "var(--c-warn)",
         danger: "var(--c-danger)",

@@ -15,4 +15,5 @@ export const NODE_COLORS: Record<string, string> = {
   metas: "var(--c-metas)",
   ganancias: "var(--c-ganancias)",
   deudas: "var(--c-deudas)",
+  testeos: "var(--c-testeos)",
 };

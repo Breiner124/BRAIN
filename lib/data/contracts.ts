@@ -1,5 +1,50 @@
 // ── Contratos de entrada compartidos por ambos backends ────────────
-import type { Deuda, Egreso, FuenteIngreso, OrigenRegistro, Proyeccion, Reunion, Tarea } from "@/lib/types";
+import type {
+  CategoriaNota,
+  Deuda,
+  Egreso,
+  EstadoTesteo,
+  FuenteIngreso,
+  OrigenRegistro,
+  Proyeccion,
+  Reunion,
+  Tarea,
+} from "@/lib/types";
+
+export interface NuevoTesteo {
+  producto: string;
+  hipotesis?: string | null;
+  fecha_testeo?: string | null;
+  prioridad?: number;
+  presupuesto?: number | null;
+  notas?: string | null;
+}
+
+export interface TesteoPatch {
+  producto?: string;
+  hipotesis?: string | null;
+  fecha_testeo?: string | null;
+  estado?: EstadoTesteo;
+  prioridad?: number;
+  presupuesto?: number | null;
+  notas?: string | null;
+  resultado?: string | null;
+}
+
+export interface NuevaNota {
+  contenido: string;
+  categoria?: CategoriaNota;
+  fecha?: string;
+  fuente?: string | null;
+}
+
+export interface NotaPatch {
+  contenido?: string;
+  categoria?: CategoriaNota;
+  fecha?: string;
+  fuente?: string | null;
+  hecha?: boolean;
+}
 
 export interface NuevaDeuda {
   nombre: string;

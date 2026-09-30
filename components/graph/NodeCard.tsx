@@ -5,6 +5,7 @@ import {
   Brain,
   CreditCard,
   DollarSign,
+  FlaskConical,
   Target,
   TrendingUp,
   User,
@@ -19,6 +20,7 @@ const ICONS: Record<string, LucideIcon> = {
   target: Target,
   dollar: DollarSign,
   "credit-card": CreditCard,
+  flask: FlaskConical,
 };
 
 export interface NodeCardData {

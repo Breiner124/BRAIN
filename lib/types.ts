@@ -11,7 +11,8 @@ export type NodoTipo =
   | "unidad_ecom"
   | "metas"
   | "ganancias"
-  | "deudas";
+  | "deudas"
+  | "testeos";
 
 export type TipoFlujo = "financiero" | "tarea" | "informativo";
 
@@ -198,4 +199,32 @@ export interface Reunion {
   fuente: "manual" | "calendly";
   calendly_event_id?: string | null;
   notas?: string;
+}
+
+// ── Nodo Testeos — programación de testeos + bloc de notas (nuevo) ──
+export type EstadoTesteo = "planificado" | "en_curso" | "hecho" | "descartado";
+
+export interface Testeo {
+  id: string;
+  producto: string;
+  hipotesis?: string | null; // qué se quiere validar
+  fecha_testeo?: string | null;
+  estado: EstadoTesteo;
+  prioridad: number; // 1 = más importante
+  presupuesto?: number | null;
+  notas?: string | null; // preparación / checklist
+  resultado?: string | null; // qué pasó / feedback
+  created_at?: string;
+}
+
+export type CategoriaNota = "mentoria" | "tarea" | "idea" | "general";
+
+export interface Nota {
+  id: string;
+  fecha: string; // fecha de la nota (ISO date)
+  categoria: CategoriaNota;
+  contenido: string;
+  fuente?: string | null; // quién lo dijo (mentor, etc.)
+  hecha?: boolean; // para tareas fundamentales
+  created_at?: string;
 }

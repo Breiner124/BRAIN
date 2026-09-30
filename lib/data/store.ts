@@ -23,11 +23,13 @@ import type {
   Ingreso,
   Meta,
   Nodo,
+  Nota,
   Profile,
   Proyeccion,
   Reunion,
   Semana,
   Tarea,
+  Testeo,
   UnidadNegocio,
 } from "@/lib/types";
 
@@ -45,6 +47,8 @@ interface DBShape {
   semanas: Semana[];
   tareas: Tarea[];
   reuniones: Reunion[];
+  testeos: Testeo[];
+  notas: Nota[];
 }
 
 // ── Semana lunes–domingo que contiene a `ref` ──────────────────────
@@ -92,6 +96,8 @@ function seed(): DBShape {
     semanas: [semanaInicial],
     tareas: [],
     reuniones: [],
+    testeos: [],
+    notas: [],
   };
 }
 

@@ -17,6 +17,7 @@ const TABLEROS: Record<string, string> = {
   metas: "/nodo/metas",
   ganancias: "/nodo/ganancias",
   deudas: "/nodo/deudas",
+  testeos: "/nodo/testeos",
 };
 
 interface Props {
@@ -81,8 +82,13 @@ export function PeekPanel({ nodo, resumen, onClose }: Props) {
               {tipo === "deudas" && <DeudasPeek r={resumen} />}
               {tipo === "yo" && (
                 <p className="text-sm text-muted">
-                  Tu semana, tareas y reuniones. El tablero completo llega con más
-                  detalle en la Fase 2.
+                  Tu semana, tareas y reuniones. Abre el tablero para gestionarlas.
+                </p>
+              )}
+              {tipo === "testeos" && (
+                <p className="text-sm text-muted">
+                  Programa testeos de producto, guarda lo que dicen tus mentores y anota
+                  tus tareas fundamentales. Abre el tablero para gestionarlo.
                 </p>
               )}
             </div>

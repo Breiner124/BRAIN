@@ -46,6 +46,7 @@ export const nodosSeed: Nodo[] = [
   { id: "n-metas", parent_id: "n-central", tipo: "metas", titulo: "Metas", resumen: "BMW · China · Navidad", posicion_x: 0.82, posicion_y: 0.22, color: "metas", icono: "target", orden: 3 },
   { id: "n-ganancias", parent_id: "n-central", tipo: "ganancias", titulo: "Ganancias", resumen: "Centro de gravedad", posicion_x: 0.8, posicion_y: 0.78, color: "ganancias", icono: "dollar", orden: 4 },
   { id: "n-deudas", parent_id: "n-central", tipo: "deudas", titulo: "Deudas", resumen: "Ordenadas por importancia", posicion_x: 0.2, posicion_y: 0.78, color: "deudas", icono: "credit-card", orden: 5 },
+  { id: "n-testeos", parent_id: "n-central", tipo: "testeos", titulo: "Testeos", resumen: "Programación de testeos + notas", posicion_x: 0.5, posicion_y: 0.9, color: "testeos", icono: "flask", orden: 6 },
 ];
 
 // ── Conexiones (sinapsis) — §1 ─────────────────────────────────────
@@ -63,6 +64,8 @@ export const conexionesSeed: Conexion[] = [
   { id: "c-10", origen_id: "n-central", destino_id: "n-metas", tipo_flujo: "informativo", activa: true },
   { id: "c-11", origen_id: "n-central", destino_id: "n-ganancias", tipo_flujo: "informativo", activa: true },
   { id: "c-12", origen_id: "n-central", destino_id: "n-deudas", tipo_flujo: "informativo", activa: true },
+  { id: "c-13", origen_id: "n-central", destino_id: "n-testeos", tipo_flujo: "informativo", activa: true },
+  { id: "c-14", origen_id: "n-testeos", destino_id: "n-proyecciones", tipo_flujo: "tarea", activa: true },
 ];
 
 // ── Deudas (§10) ───────────────────────────────────────────────────
