@@ -3,19 +3,20 @@
 // envuelve en promesas para exponer la misma API async que Supabase.
 
 import { db, uid, todayISO, rangoSemana } from "@/lib/data/store";
-import type {
-  Deuda,
-  DeudaMovimiento,
-  Egreso,
-  Ingreso,
-  Meta,
-  Nota,
-  OrigenRegistro,
-  Proyeccion,
-  Reunion,
-  Semana,
-  Tarea,
-  Testeo,
+import {
+  PASOS_TESTEO_DEFECTO,
+  type Deuda,
+  type DeudaMovimiento,
+  type Egreso,
+  type Ingreso,
+  type Meta,
+  type Nota,
+  type OrigenRegistro,
+  type Proyeccion,
+  type Reunion,
+  type Semana,
+  type Tarea,
+  type Testeo,
 } from "@/lib/types";
 import type {
   NotaPatch,
@@ -341,6 +342,13 @@ export function crearTesteo(data: NuevoTesteo): Testeo {
     presupuesto: data.presupuesto ?? null,
     notas: data.notas ?? null,
     resultado: null,
+    cuello_botella: data.cuello_botella ?? null,
+    fecha_correccion: data.fecha_correccion ?? null,
+    pasos: PASOS_TESTEO_DEFECTO.map((titulo, i) => ({
+      id: `p${i}-${Math.random().toString(36).slice(2, 7)}`,
+      titulo,
+      hecho: false,
+    })),
     created_at: new Date().toISOString(),
   };
   db().testeos.unshift(testeo);

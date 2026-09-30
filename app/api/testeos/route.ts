@@ -11,6 +11,8 @@ const schema = z.object({
   prioridad: z.number().int().min(1).max(5).optional(),
   presupuesto: z.number().nullish(),
   notas: z.string().nullish(),
+  cuello_botella: z.string().nullish(),
+  fecha_correccion: z.string().nullish(),
 });
 
 export async function GET() {

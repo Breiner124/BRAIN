@@ -6,6 +6,7 @@ import type {
   EstadoTesteo,
   FuenteIngreso,
   OrigenRegistro,
+  PasoTesteo,
   Proyeccion,
   Reunion,
   Tarea,
@@ -18,6 +19,8 @@ export interface NuevoTesteo {
   prioridad?: number;
   presupuesto?: number | null;
   notas?: string | null;
+  cuello_botella?: string | null;
+  fecha_correccion?: string | null;
 }
 
 export interface TesteoPatch {
@@ -29,6 +32,9 @@ export interface TesteoPatch {
   presupuesto?: number | null;
   notas?: string | null;
   resultado?: string | null;
+  cuello_botella?: string | null;
+  fecha_correccion?: string | null;
+  pasos?: PasoTesteo[];
 }
 
 export interface NuevaNota {

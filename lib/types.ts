@@ -204,18 +204,36 @@ export interface Reunion {
 // ── Nodo Testeos — programación de testeos + bloc de notas (nuevo) ──
 export type EstadoTesteo = "planificado" | "en_curso" | "hecho" | "descartado";
 
+export interface PasoTesteo {
+  id: string;
+  titulo: string;
+  hecho: boolean;
+  nota?: string; // lo que voy anotando de este paso
+}
+
 export interface Testeo {
   id: string;
   producto: string;
   hipotesis?: string | null; // qué se quiere validar
-  fecha_testeo?: string | null;
+  fecha_testeo?: string | null; // día programado de los ads / inicio
   estado: EstadoTesteo;
   prioridad: number; // 1 = más importante
   presupuesto?: number | null;
   notas?: string | null; // preparación / checklist
   resultado?: string | null; // qué pasó / feedback
+  cuello_botella?: string | null; // qué está trabando
+  fecha_correccion?: string | null; // fecha límite para corregirlo
+  pasos?: PasoTesteo[]; // checklist con progreso
   created_at?: string;
 }
+
+// Pasos por defecto de un testeo (§ flujo del usuario)
+export const PASOS_TESTEO_DEFECTO = [
+  "Descargar ads",
+  "Investigación de mercado",
+  "Desarrollar landing",
+  "Montaje de campañas",
+];
 
 export type CategoriaNota = "mentoria" | "tarea" | "idea" | "general";
 

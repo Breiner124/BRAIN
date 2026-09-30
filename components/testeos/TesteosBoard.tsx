@@ -15,9 +15,10 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Select } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { ProgressBar } from "@/components/finance/ProgressBar";
 import { cn } from "@/lib/utils";
 import { formatCOP } from "@/lib/format";
-import type { CategoriaNota, EstadoTesteo, Nota, Testeo } from "@/lib/types";
+import type { CategoriaNota, EstadoTesteo, Nota, PasoTesteo, Testeo } from "@/lib/types";
 
 const num = (s: string) => Number(s.replace(/\D/g, ""));
 
@@ -216,7 +217,16 @@ function TesteoCard({
   const [notas, setNotas] = useState(t.notas ?? "");
   const [resultado, setResultado] = useState(t.resultado ?? "");
   const [fecha, setFecha] = useState(t.fecha_testeo ?? "");
+  const [cuello, setCuello] = useState(t.cuello_botella ?? "");
+  const [fechaCorr, setFechaCorr] = useState(t.fecha_correccion ?? "");
   const est = ESTADO_TESTEO[t.estado];
+
+  const pasos = t.pasos ?? [];
+  const hechos = pasos.filter((p) => p.hecho).length;
+
+  function guardarPasos(nuevos: PasoTesteo[]) {
+    call(`/api/testeos/${t.id}`, "PATCH", { pasos: nuevos });
+  }
 
   return (
     <Card style={{ borderColor: `${est.color}55` }}>
@@ -267,13 +277,67 @@ function TesteoCard({
         </div>
       </div>
 
+      {/* Progreso del desarrollo */}
+      {pasos.length > 0 && (
+        <div className="mt-3">
+          <ProgressBar
+            label="Progreso del desarrollo"
+            logrado={hechos}
+            objetivo={pasos.length}
+            color="var(--c-testeos)"
+            mostrarMontos={false}
+          />
+        </div>
+      )}
+
+      {/* Cuello de botella */}
+      {t.cuello_botella && (
+        <div className="mt-2 rounded-lg border border-[var(--c-warn)]/40 bg-[var(--c-warn)]/10 p-2.5">
+          <p className="text-xs font-semibold uppercase text-warn">⚠ Cuello de botella</p>
+          <p className="whitespace-pre-wrap text-sm text-fg">{t.cuello_botella}</p>
+          {t.fecha_correccion && (
+            <p className="mt-0.5 text-xs text-muted">Corregir antes del {t.fecha_correccion}</p>
+          )}
+        </div>
+      )}
+
       {t.hipotesis && (
         <p className="mt-2 text-xs text-muted">
           <span className="font-semibold text-fg">Hipótesis:</span> {t.hipotesis}
         </p>
       )}
+
+      {/* Checklist de pasos */}
+      {pasos.length > 0 && (
+        <ul className="mt-3 space-y-1.5">
+          {pasos.map((p) => (
+            <PasoRow
+              key={p.id}
+              paso={p}
+              busy={busy}
+              onToggle={() =>
+                guardarPasos(pasos.map((x) => (x.id === p.id ? { ...x, hecho: !x.hecho } : x)))
+              }
+              onNota={(nota) =>
+                guardarPasos(pasos.map((x) => (x.id === p.id ? { ...x, nota } : x)))
+              }
+              onDelete={() => guardarPasos(pasos.filter((x) => x.id !== p.id))}
+            />
+          ))}
+        </ul>
+      )}
+      <AgregarPaso
+        busy={busy}
+        onAdd={(titulo) =>
+          guardarPasos([
+            ...pasos,
+            { id: `p-${Math.random().toString(36).slice(2, 8)}`, titulo, hecho: false },
+          ])
+        }
+      />
+
       {t.notas && (
-        <div className="mt-2">
+        <div className="mt-3">
           <p className="text-xs font-semibold uppercase text-muted">Preparación</p>
           <p className="whitespace-pre-wrap text-sm text-fg">{t.notas}</p>
         </div>
@@ -286,17 +350,41 @@ function TesteoCard({
       )}
 
       <Modal open={editar} onClose={() => setEditar(false)} title={t.producto}>
-        <div className="space-y-4 text-left">
+        <div className="max-h-[70vh] space-y-4 overflow-y-auto text-left">
           <div>
-            <Label>¿Cuándo testear?</Label>
+            <Label>¿Cuándo se programan los ads? (día de inicio)</Label>
             <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} />
+            <p className="mt-1 text-xs text-muted">
+              Ese día el cerebro te avisará que debes iniciar el desarrollo.
+            </p>
+          </div>
+          <div className="rounded-xl border border-[var(--c-warn)]/40 bg-[var(--c-warn)]/5 p-3">
+            <Label>⚠ Cuello de botella (qué está trabando)</Label>
+            <textarea
+              value={cuello}
+              onChange={(e) => setCuello(e.target.value)}
+              rows={2}
+              placeholder="Ej: el proveedor no ha enviado el producto, falta aprobar el creativo…"
+              className="w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm text-fg outline-none placeholder:text-muted focus:border-warn"
+            />
+            <div className="mt-2">
+              <Label>Fecha de corrección</Label>
+              <Input
+                type="date"
+                value={fechaCorr}
+                onChange={(e) => setFechaCorr(e.target.value)}
+              />
+              <p className="mt-1 text-xs text-muted">
+                Aparecerá en las notificaciones del cerebro al acercarse.
+              </p>
+            </div>
           </div>
           <div>
-            <Label>Preparación / checklist</Label>
+            <Label>Preparación / notas</Label>
             <textarea
               value={notas}
               onChange={(e) => setNotas(e.target.value)}
-              rows={4}
+              rows={3}
               placeholder="Ej: creativos listos, landing lista, presupuesto $300k/día…"
               className="w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm text-fg outline-none placeholder:text-muted focus:border-testeos"
             />
@@ -306,7 +394,7 @@ function TesteoCard({
             <textarea
               value={resultado}
               onChange={(e) => setResultado(e.target.value)}
-              rows={4}
+              rows={3}
               placeholder="Ej: CPA $42k, CTR 1.8%. Mentor sugiere cambiar el hook…"
               className="w-full rounded-xl border border-border bg-surface-2 px-3 py-2 text-sm text-fg outline-none placeholder:text-muted focus:border-testeos"
             />
@@ -320,6 +408,8 @@ function TesteoCard({
                 fecha_testeo: fecha || null,
                 notas,
                 resultado,
+                cuello_botella: cuello || null,
+                fecha_correccion: fechaCorr || null,
               });
               setEditar(false);
             }}
@@ -329,6 +419,101 @@ function TesteoCard({
         </div>
       </Modal>
     </Card>
+  );
+}
+
+// ── Fila de un paso del checklist ──────────────────────────────────
+function PasoRow({
+  paso,
+  busy,
+  onToggle,
+  onNota,
+  onDelete,
+}: {
+  paso: PasoTesteo;
+  busy: boolean;
+  onToggle: () => void;
+  onNota: (nota: string) => void;
+  onDelete: () => void;
+}) {
+  const [nota, setNota] = useState(paso.nota ?? "");
+  const [abierto, setAbierto] = useState(false);
+
+  return (
+    <li className="rounded-lg border border-border bg-surface-2 p-2">
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onToggle}
+          disabled={busy}
+          className={cn(
+            "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+            paso.hecho ? "border-testeos bg-testeos text-black" : "border-border"
+          )}
+          aria-label="Marcar paso"
+        >
+          {paso.hecho && <Check size={12} />}
+        </button>
+        <span className={cn("flex-1 text-sm text-fg", paso.hecho && "text-muted line-through")}>
+          {paso.titulo}
+        </span>
+        <button
+          onClick={() => setAbierto((v) => !v)}
+          className="rounded p-1 text-muted hover:text-testeos"
+          title="Anotar"
+        >
+          <Pencil size={13} />
+        </button>
+        <button
+          onClick={onDelete}
+          disabled={busy}
+          className="rounded p-1 text-muted hover:text-danger"
+          title="Quitar paso"
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
+      {(abierto || paso.nota) && (
+        <input
+          value={nota}
+          onChange={(e) => setNota(e.target.value)}
+          onBlur={() => nota !== (paso.nota ?? "") && onNota(nota)}
+          onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+          placeholder="Anota lo que hiciste…"
+          className="mt-1.5 w-full rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs text-fg outline-none placeholder:text-muted focus:border-testeos"
+        />
+      )}
+    </li>
+  );
+}
+
+function AgregarPaso({ busy, onAdd }: { busy: boolean; onAdd: (t: string) => void }) {
+  const [titulo, setTitulo] = useState("");
+  return (
+    <div className="mt-2 flex gap-1.5">
+      <Input
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && titulo.trim()) {
+            onAdd(titulo.trim());
+            setTitulo("");
+          }
+        }}
+        placeholder="+ Agregar paso…"
+        className="text-sm"
+      />
+      <Button
+        size="sm"
+        variant="outline"
+        disabled={busy || !titulo.trim()}
+        onClick={() => {
+          onAdd(titulo.trim());
+          setTitulo("");
+        }}
+      >
+        <Plus size={15} />
+      </Button>
+    </div>
   );
 }
 

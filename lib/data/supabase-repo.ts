@@ -3,22 +3,23 @@
 // único (CEREBRO_USER_ID) usando el cliente service-role del servidor.
 
 import { admin, cerebroUserId } from "@/lib/supabase/admin";
-import type {
-  Conexion,
-  Deuda,
-  DeudaMovimiento,
-  Egreso,
-  Ingreso,
-  Meta,
-  Nodo,
-  Nota,
-  Profile,
-  Proyeccion,
-  Reunion,
-  Semana,
-  Tarea,
-  Testeo,
-  UnidadNegocio,
+import {
+  PASOS_TESTEO_DEFECTO,
+  type Conexion,
+  type Deuda,
+  type DeudaMovimiento,
+  type Egreso,
+  type Ingreso,
+  type Meta,
+  type Nodo,
+  type Nota,
+  type Profile,
+  type Proyeccion,
+  type Reunion,
+  type Semana,
+  type Tarea,
+  type Testeo,
+  type UnidadNegocio,
 } from "@/lib/types";
 import type {
   NotaPatch,
@@ -533,6 +534,13 @@ export async function crearTesteo(data: NuevoTesteo): Promise<Testeo> {
     presupuesto: data.presupuesto ?? null,
     notas: data.notas ?? null,
     resultado: null,
+    cuello_botella: data.cuello_botella ?? null,
+    fecha_correccion: data.fecha_correccion ?? null,
+    pasos: PASOS_TESTEO_DEFECTO.map((titulo, i) => ({
+      id: `p${i}-${Math.random().toString(36).slice(2, 7)}`,
+      titulo,
+      hecho: false,
+    })),
   };
   const res = await admin().from("testeos").insert(row).select("*").single();
   return ok(res) as Testeo;

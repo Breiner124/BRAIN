@@ -15,8 +15,15 @@ create table if not exists testeos (
   presupuesto numeric,
   notas text,      -- preparación / checklist
   resultado text,  -- qué pasó / feedback de mentores
+  cuello_botella text,      -- qué está trabando
+  fecha_correccion date,    -- fecha límite para corregirlo
+  pasos jsonb,              -- checklist con progreso
   created_at timestamptz default now()
 );
+-- Si la tabla ya existía, agrega las columnas nuevas:
+alter table testeos add column if not exists cuello_botella text;
+alter table testeos add column if not exists fecha_correccion date;
+alter table testeos add column if not exists pasos jsonb;
 
 create table if not exists notas (
   id uuid primary key default gen_random_uuid(),
