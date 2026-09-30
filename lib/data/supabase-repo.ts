@@ -110,6 +110,17 @@ export async function crearIngreso(data: NuevoIngreso): Promise<Ingreso> {
   return ok(res) as Ingreso;
 }
 
+export async function eliminarIngreso(ingreso_id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  const res = await admin()
+    .from("ingresos")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", ingreso_id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id: ingreso_id };
+}
+
 export async function crearEgreso(data: NuevoEgreso): Promise<Egreso> {
   const uid = cerebroUserId();
   const row = {
@@ -274,6 +285,43 @@ export async function aportarMeta(meta_id: string, monto: number): Promise<Meta>
     .select("*")
     .single();
   return ok(upd) as Meta;
+}
+
+export async function actualizarMeta(
+  meta_id: string,
+  patch: { ahorrado?: number; costo_objetivo?: number }
+): Promise<Meta> {
+  const set: Record<string, number> = {};
+  if (patch.costo_objetivo != null) set.costo_objetivo = patch.costo_objetivo;
+  if (patch.ahorrado != null) set.ahorrado = Math.max(0, patch.ahorrado);
+  const res = await admin()
+    .from("metas")
+    .update(set)
+    .eq("id", meta_id)
+    .select("*")
+    .single();
+  const m = ok(res) as Meta | null;
+  if (!m) throw new Error("Meta no encontrada");
+  return m;
+}
+
+export async function eliminarMeta(meta_id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  await admin().from("tareas").update({ vinculo_meta_id: null }).eq("vinculo_meta_id", meta_id);
+  const res = await admin().from("metas").delete().eq("user_id", uid).eq("id", meta_id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id: meta_id };
+}
+
+export async function eliminarReunion(reunion_id: string): Promise<{ id: string }> {
+  const uid = cerebroUserId();
+  const res = await admin()
+    .from("reuniones")
+    .delete()
+    .eq("user_id", uid)
+    .eq("id", reunion_id);
+  if (res.error) throw new Error(`Supabase: ${res.error.message}`);
+  return { id: reunion_id };
 }
 
 export async function crearProyeccion(data: NuevaProyeccion): Promise<{

@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { DeleteButton } from "@/components/ui/DeleteButton";
 import { formatCOP } from "@/lib/format";
 import type { Ingreso } from "@/lib/types";
 
@@ -46,6 +47,10 @@ export function IncomeList({ ingresos }: { ingresos: Ingreso[] }) {
                 </div>
               </div>
               <span className="shrink-0 font-bold text-fg">{formatCOP(i.monto)}</span>
+              <DeleteButton
+                url={`/api/ingresos/${i.id}`}
+                confirmar={`¿Eliminar el ingreso "${i.descripcion}"?`}
+              />
             </li>
           ))}
         </ul>

@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CalendarPlus, Check, Clock, Plus, RotateCcw } from "lucide-react";
+import { CalendarPlus, Check, Clock, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -188,15 +188,29 @@ export function WeekBoard({ semana, tareas, reuniones }: Props) {
             {[...reuniones]
               .sort((a, b) => +new Date(a.inicio) - +new Date(b.inicio))
               .map((r) => (
-                <li key={r.id} className="flex items-center justify-between py-2.5">
-                  <div>
-                    <p className="text-sm font-medium text-fg">{r.titulo}</p>
+                <li key={r.id} className="flex items-center justify-between gap-2 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-fg">{r.titulo}</p>
                     <p className="text-xs text-muted">
                       {r.con_quien ? `con ${r.con_quien} · ` : ""}
                       {new Date(r.inicio).toLocaleString("es-CO")}
                     </p>
                   </div>
-                  <Badge>{r.ambito}</Badge>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Badge>{r.ambito}</Badge>
+                    <button
+                      onClick={() => {
+                        if (confirm(`¿Eliminar la reunión "${r.titulo}"?`))
+                          call(`/api/reuniones/${r.id}`, "DELETE");
+                      }}
+                      disabled={busy}
+                      className="rounded-lg p-1.5 text-muted hover:bg-surface hover:text-danger disabled:opacity-50"
+                      aria-label="Eliminar reunión"
+                      title="Eliminar"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </li>
               ))}
           </ul>

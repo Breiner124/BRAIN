@@ -61,6 +61,13 @@ export function crearIngreso(data: NuevoIngreso): Ingreso {
   return ingreso;
 }
 
+export function eliminarIngreso(ingreso_id: string): { id: string } {
+  const idx = db().ingresos.findIndex((i) => i.id === ingreso_id);
+  if (idx === -1) throw new Error("Ingreso no encontrado");
+  db().ingresos.splice(idx, 1);
+  return { id: ingreso_id };
+}
+
 export function crearEgreso(data: NuevoEgreso): Egreso {
   const egreso: Egreso = {
     id: uid("egr"),
@@ -146,6 +153,24 @@ export function aportarMeta(meta_id: string, monto: number): Meta {
   if (monto <= 0) throw new Error("El aporte debe ser mayor que 0");
   meta.ahorrado = Math.min(meta.costo_objetivo, meta.ahorrado + monto);
   return meta;
+}
+
+export function actualizarMeta(
+  meta_id: string,
+  patch: { ahorrado?: number; costo_objetivo?: number }
+): Meta {
+  const meta = db().metas.find((m) => m.id === meta_id);
+  if (!meta) throw new Error("Meta no encontrada");
+  if (patch.costo_objetivo != null) meta.costo_objetivo = patch.costo_objetivo;
+  if (patch.ahorrado != null) meta.ahorrado = Math.max(0, patch.ahorrado);
+  return meta;
+}
+
+export function eliminarMeta(meta_id: string): { id: string } {
+  const idx = db().metas.findIndex((m) => m.id === meta_id);
+  if (idx === -1) throw new Error("Meta no encontrada");
+  db().metas.splice(idx, 1);
+  return { id: meta_id };
 }
 
 export function crearProyeccion(data: NuevaProyeccion): {
@@ -283,6 +308,13 @@ export function crearReunion(data: NuevaReunion): Reunion {
   };
   db().reuniones.push(reunion);
   return reunion;
+}
+
+export function eliminarReunion(reunion_id: string): { id: string } {
+  const idx = db().reuniones.findIndex((r) => r.id === reunion_id);
+  if (idx === -1) throw new Error("Reunión no encontrada");
+  db().reuniones.splice(idx, 1);
+  return { id: reunion_id };
 }
 
 export function upsertReunionCalendly(data: ReunionCalendly): Reunion {

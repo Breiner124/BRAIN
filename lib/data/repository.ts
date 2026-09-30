@@ -84,6 +84,17 @@ export const crearIngreso = (data: NuevoIngreso): Promise<Ingreso> =>
   SB() ? sb.crearIngreso(data) : Promise.resolve(mem.crearIngreso(data));
 export const crearEgreso = (data: NuevoEgreso): Promise<Egreso> =>
   SB() ? sb.crearEgreso(data) : Promise.resolve(mem.crearEgreso(data));
+export const eliminarIngreso = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarIngreso(id) : Promise.resolve(mem.eliminarIngreso(id));
+export const actualizarMeta = (
+  id: string,
+  patch: { ahorrado?: number; costo_objetivo?: number }
+): Promise<Meta> =>
+  SB() ? sb.actualizarMeta(id, patch) : Promise.resolve(mem.actualizarMeta(id, patch));
+export const eliminarMeta = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarMeta(id) : Promise.resolve(mem.eliminarMeta(id));
+export const eliminarReunion = (id: string): Promise<{ id: string }> =>
+  SB() ? sb.eliminarReunion(id) : Promise.resolve(mem.eliminarReunion(id));
 export const abonarDeuda = (deuda_id: string, monto: number) =>
   SB() ? sb.abonarDeuda(deuda_id, monto) : Promise.resolve(mem.abonarDeuda(deuda_id, monto));
 export const pagarDeudaTotal = (deuda_id: string) =>

@@ -54,6 +54,25 @@ export function MetaCard({ meta, aporteMensual, mesesRestantes }: Props) {
     }
   }
 
+  async function accionMeta(metodo: "PATCH" | "DELETE", body?: object) {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/metas/${meta.id}`, {
+        method: metodo,
+        headers: { "Content-Type": "application/json" },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Error");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <Card>
       <div className="mb-3 flex items-start justify-between gap-2">
@@ -86,11 +105,37 @@ export function MetaCard({ meta, aporteMensual, mesesRestantes }: Props) {
         </p>
       )}
 
-      {!completa && (
-        <Button size="sm" variant="outline" className="mt-4" onClick={() => setAbrir(true)}>
-          Aportar
+      <div className="mt-4 flex flex-wrap gap-2">
+        {!completa && (
+          <Button size="sm" variant="outline" onClick={() => setAbrir(true)}>
+            Aportar
+          </Button>
+        )}
+        {meta.ahorrado > 0 && (
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={busy}
+            onClick={() => {
+              if (confirm(`¿Reiniciar el progreso de "${meta.nombre}" a 0%?`))
+                accionMeta("PATCH", { ahorrado: 0 });
+            }}
+          >
+            Reiniciar a 0%
+          </Button>
+        )}
+        <Button
+          size="sm"
+          variant="ghost"
+          disabled={busy}
+          onClick={() => {
+            if (confirm(`¿Eliminar la meta "${meta.nombre}"?`)) accionMeta("DELETE");
+          }}
+        >
+          Eliminar
         </Button>
-      )}
+      </div>
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
 
       <Modal open={abrir} onClose={() => setAbrir(false)} title={`Aportar a ${meta.nombre}`}>
         <div className="space-y-3">
