@@ -136,6 +136,10 @@ export interface Proyeccion {
   fecha_objetivo?: string | null;
   fecha_tipo: "fija" | "variable";
   estado: "pendiente" | "en_progreso" | "lograda";
+  /** Avance acumulado (COP) — usado por proyecciones personales para su barra. */
+  avance?: number;
+  /** Objetivo de la barra (COP) — para proyecciones personales de patrimonio/ahorro. */
+  objetivo?: number | null;
   detalle?: Record<string, unknown>;
 }
 
@@ -158,4 +162,40 @@ export interface EscenarioFacturacion {
   clave: EscenarioClave;
   nombre: string;
   facturacion_mes: number;
+}
+
+// ── Nodo Yo — semanas, tareas, reuniones (§4.8, §7) ────────────────
+export type AmbitoTrabajo = "consultoria" | "ecom" | "personal";
+
+export interface Semana {
+  id: string;
+  fecha_inicio: string; // ISO date (lunes)
+  fecha_fin: string; // ISO date (domingo)
+  activa: boolean;
+  nota?: string;
+}
+
+export interface Tarea {
+  id: string;
+  semana_id: string;
+  ambito: AmbitoTrabajo;
+  titulo: string;
+  descripcion?: string;
+  estado: "pendiente" | "hecha" | "aplazada";
+  heredada: boolean; // vino de semana anterior
+  prioridad: number;
+  vinculo_meta_id?: string | null;
+  vinculo_proyeccion_id?: string | null;
+}
+
+export interface Reunion {
+  id: string;
+  ambito: "consultoria" | "ecom";
+  titulo: string;
+  con_quien?: string;
+  inicio: string; // ISO datetime
+  fin?: string | null;
+  fuente: "manual" | "calendly";
+  calendly_event_id?: string | null;
+  notas?: string;
 }

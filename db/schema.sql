@@ -60,6 +60,8 @@ create table if not exists proyecciones (
   facturacion_esperada numeric,
   costo_estimado numeric,        -- inversión requerida (una vez)
   costo_recurrente numeric,      -- costo fijo mensual generado (ej: salario)
+  objetivo numeric,              -- objetivo de la barra (proyecciones personales)
+  avance numeric default 0,      -- avance acumulado (proyecciones personales)
   fecha_objetivo date,
   fecha_tipo text,       -- 'fija'|'variable'
   estado text default 'pendiente', -- 'pendiente'|'en_progreso'|'lograda'

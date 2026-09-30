@@ -8,22 +8,24 @@ Plataforma personal de vida, finanzas, proyecciones y ganancias, visualizada com
 
 ---
 
-## ✅ Estado — Fase 1 (Fundación) completa
+## ✅ Estado — Fases 1 y 2 completas
 
 | Módulo | Estado |
 |---|---|
-| Grafo neuronal (home) con nodos + sinapsis animadas + peek panels | ✅ |
+| Grafo neuronal (home) con nodos + **sinapsis con pulso animado** + peek panels | ✅ |
 | Nodo **Ganancias**: alta rápida + bandeja unificada + cruce + óptimos + excedente | ✅ |
 | Nodo **Deudas**: abonar / pagar en totalidad, ordenadas por importancia | ✅ |
 | Nodo **Metas**: barras de progreso + aportar + "cuánto apartar/mes" | ✅ |
-| Nodo **Proyecciones**: escenarios §9 + ROI de expansión §6.7 (base) | ✅ |
-| Nodo **Yo**: base de la semana (tablero completo → Fase 2) | ▫️ base |
-| **Motor Financiero** (§6.2–6.8) como funciones puras + **21 tests Vitest** | ✅ |
+| Nodo **Proyecciones Personales**: crear + barra de avance + aportar | ✅ |
+| Nodo **Proyección Empresarial**: Consultoría + E-com con **flujo bidireccional** | ✅ |
+| Escenarios §9 (ScenarioSlider) + ROI de expansión §6.7 | ✅ |
+| Nodo **Yo** completo: semana por ámbito + arrastre de tareas + reuniones | ✅ |
+| **Motor Financiero** (§6.2–6.8) puro + **26 tests Vitest** | ✅ |
 | API route handlers (§11) | ✅ |
 | Esquema Supabase (`/db/schema.sql`) + seed (`/db/seed.sql`) | ✅ |
 
-**Fase 2** (siguiente): flujo bidireccional de ganancias completo en UI, Proyecciones
-Personales, semana con arrastre de tareas, animaciones de sinapsis por flujo.
+**Fase 3** (siguiente): integración Calendly (webhooks §14), Google Calendar opcional,
+reportes/exportables, notificaciones y refinamiento visual.
 
 ---
 
@@ -64,10 +66,12 @@ el motor recalcular en vivo.
 /app
   /(auth)/login          → placeholder de login (Supabase Auth en Fase 1→persistencia)
   /page.tsx              → grafo neuronal (home)
-  /nodo/{ganancias,deudas,metas,proyecciones,yo}
+  /nodo/ganancias · /nodo/deudas · /nodo/metas · /nodo/yo
+  /nodo/proyecciones · /personales · /empresarial · /empresarial/{consultoria,ecom}
   /api/...               → route handlers (§11)
-/components/graph        → NeuralGraph, NodeCard, PeekPanel
-/components/finance      → ProgressBar, DebtCard, MetaCard, IncomeQuickAdd, OptimalMeter…
+/components/graph        → NeuralGraph, NodeCard, SynapseEdge, PeekPanel
+/components/finance      → ProgressBar, DebtCard, MetaCard, IncomeQuickAdd, ScenarioSlider…
+/components/yo           → WeekBoard (semana, tareas, reuniones)
 /lib/engine              → motor financiero + tests
 /lib/data                → store en memoria (demo) + repositorio de dominio
 /lib/supabase            → clientes (para persistencia real)

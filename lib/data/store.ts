@@ -25,6 +25,9 @@ import type {
   Nodo,
   Profile,
   Proyeccion,
+  Reunion,
+  Semana,
+  Tarea,
   UnidadNegocio,
 } from "@/lib/types";
 
@@ -39,6 +42,20 @@ interface DBShape {
   deuda_movimientos: DeudaMovimiento[];
   metas: Meta[];
   proyecciones: Proyeccion[];
+  semanas: Semana[];
+  tareas: Tarea[];
+  reuniones: Reunion[];
+}
+
+// ── Semana lunes–domingo que contiene a `ref` ──────────────────────
+export function rangoSemana(ref: Date): { inicio: string; fin: string } {
+  const d = new Date(ref);
+  const dia = (d.getDay() + 6) % 7; // 0 = lunes
+  const lunes = new Date(d);
+  lunes.setDate(d.getDate() - dia);
+  const domingo = new Date(lunes);
+  domingo.setDate(lunes.getDate() + 6);
+  return { inicio: lunes.toISOString().slice(0, 10), fin: domingo.toISOString().slice(0, 10) };
 }
 
 // Singleton resistente a hot-reload de Next.
@@ -53,6 +70,14 @@ function seed(): DBShape {
       : { ...p }
   );
   void logistica;
+  const { inicio, fin } = rangoSemana(new Date());
+  const semanaInicial: Semana = {
+    id: "sem-inicial",
+    fecha_inicio: inicio,
+    fecha_fin: fin,
+    activa: true,
+    nota: "Semana inicial",
+  };
   return {
     profile: { ...profileSeed },
     nodos: nodosSeed.map((n) => ({ ...n })),
@@ -64,6 +89,9 @@ function seed(): DBShape {
     deuda_movimientos: [],
     metas: metasSeed.map((m) => ({ ...m })),
     proyecciones,
+    semanas: [semanaInicial],
+    tareas: [],
+    reuniones: [],
   };
 }
 

@@ -2,6 +2,33 @@
 
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es/).
 
+## [0.2.0] — Fase 2: Proyecciones y profundidad — 2026-09-30
+
+### Added
+- **Proyección Empresarial** reestructurada en dos unidades con subnodos:
+  - `/nodo/proyecciones/empresarial/consultoria`: proyección esperada vs realizado y
+    **anexar ganancias** (fuente consultoría → caen en Ganancias como `proy_consultoria`).
+  - `/nodo/proyecciones/empresarial/ecom`: **ScenarioSlider** (conservador↔stretch),
+    bolsillo al 15%, expansiones con **ROI** (§6.7) y anexar ganancias (`proy_ecom`).
+- **Flujo bidireccional de ganancias** completo en UI (§5.3, §11): una sola tabla
+  `ingresos`, dos puertas de entrada (Ganancias o Proyección Empresarial).
+- **Proyecciones Personales** (`/nodo/proyecciones/personales`): crear proyección con
+  objetivo y **barra de avance**, más aportes que la llenan.
+- **Nodo Yo completo** (§7): tablero semanal por ámbito (Consultoría / E-com / Personal),
+  crear tareas, marcar hechas / aplazar, **"Iniciar nueva semana"** con arrastre de
+  pendientes (etiqueta ⏮ Semana pasada), y **reuniones manuales**.
+- **Animaciones de sinapsis** (§12): edge custom con un pulso que viaja por las
+  conexiones de flujo financiero y de tareas.
+- **Formulario de proyecciones** reutilizable (personal / empresarial por tipo).
+- Nuevas API: `/api/proyecciones/:id/aportar`, `/api/semanas/nueva`, `/api/tareas`,
+  `/api/tareas/:id`, `/api/reuniones`.
+- **5 tests nuevos** (arrastre de semana, aporte a proyección, flujo bidireccional):
+  total **26 tests** en verde.
+
+### Changed
+- Esquema Supabase: columnas `objetivo` y `avance` en `proyecciones`.
+- El hub `/nodo/proyecciones` ahora enlaza a Personales y Empresarial.
+
 ## [0.1.0] — Fase 1: Fundación — 2026-09-30
 
 ### Added

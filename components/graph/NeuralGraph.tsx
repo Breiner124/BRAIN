@@ -10,6 +10,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useCallback, useMemo, useState } from "react";
 import { NodeCard } from "@/components/graph/NodeCard";
+import { SynapseEdge } from "@/components/graph/SynapseEdge";
 import { PeekPanel } from "@/components/graph/PeekPanel";
 import type { Conexion, Nodo } from "@/lib/types";
 import type { ResumenNodo } from "@/lib/summary";
@@ -20,6 +21,7 @@ const CANVAS_W = 1100;
 const CANVAS_H = 640;
 
 const nodeTypes = { cerebro: NodeCard };
+const edgeTypes = { synapse: SynapseEdge };
 
 function metricFor(tipo: string, r: ResumenNodo): string | undefined {
   switch (tipo) {
@@ -75,26 +77,13 @@ export function NeuralGraph({ nodos, conexiones, resumen }: Props) {
 
   const rfEdges: Edge[] = useMemo(
     () =>
-      conexiones.map((c) => {
-        const financiero = c.tipo_flujo === "financiero";
-        const color =
-          c.tipo_flujo === "financiero"
-            ? "var(--c-ganancias)"
-            : c.tipo_flujo === "tarea"
-            ? "var(--c-yo)"
-            : "var(--border)";
-        return {
-          id: c.id,
-          source: c.origen_id,
-          target: c.destino_id,
-          animated: financiero,
-          style: {
-            stroke: color,
-            strokeWidth: financiero ? 2 : 1.2,
-            opacity: financiero ? 0.9 : 0.4,
-          },
-        };
-      }),
+      conexiones.map((c) => ({
+        id: c.id,
+        source: c.origen_id,
+        target: c.destino_id,
+        type: "synapse",
+        data: { tipo_flujo: c.tipo_flujo },
+      })),
     [conexiones]
   );
 
@@ -112,6 +101,7 @@ export function NeuralGraph({ nodos, conexiones, resumen }: Props) {
         nodes={rfNodes}
         edges={rfEdges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         onNodeClick={onNodeClick}
         fitView
         fitViewOptions={{ padding: 0.2 }}

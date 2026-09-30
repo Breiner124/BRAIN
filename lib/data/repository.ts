@@ -3,7 +3,7 @@
 // en memoria (demo). Cuando Supabase esté conectado, aquí se cambia la
 // implementación sin tocar las rutas ni la UI.
 
-import { db, uid, todayISO, escenarios } from "@/lib/data/store";
+import { db, uid, todayISO, escenarios, rangoSemana } from "@/lib/data/store";
 import type {
   Deuda,
   DeudaMovimiento,
@@ -13,6 +13,9 @@ import type {
   Meta,
   OrigenRegistro,
   Proyeccion,
+  Reunion,
+  Semana,
+  Tarea,
 } from "@/lib/types";
 import {
   correrMotor,
@@ -31,6 +34,11 @@ export const getEgresos = () => db().egresos;
 export const getDeudas = () => db().deudas;
 export const getMetas = () => db().metas;
 export const getProyecciones = () => db().proyecciones;
+export const getSemanas = () => db().semanas;
+export const getSemanaActiva = () => db().semanas.find((s) => s.activa);
+export const getTareas = (semana_id?: string) =>
+  semana_id ? db().tareas.filter((t) => t.semana_id === semana_id) : db().tareas;
+export const getReuniones = () => db().reuniones;
 export const getDeudaMovimientos = (deuda_id?: string) =>
   deuda_id
     ? db().deuda_movimientos.filter((m) => m.deuda_id === deuda_id)
@@ -166,6 +174,8 @@ export interface NuevaProyeccion {
   fecha_objetivo?: string | null;
   fecha_tipo?: "fija" | "variable";
   estado?: Proyeccion["estado"];
+  objetivo?: number | null; // para proyecciones personales (barra de avance)
+  avance?: number;
   // Si se anexa una ganancia desde la proyección (§5.3, §11):
   ganancia?: { monto: number; fuente: FuenteIngreso; es_facturacion?: boolean };
 }
@@ -186,6 +196,8 @@ export function crearProyeccion(data: NuevaProyeccion): {
     fecha_objetivo: data.fecha_objetivo ?? null,
     fecha_tipo: data.fecha_tipo ?? "variable",
     estado: data.estado ?? "pendiente",
+    objetivo: data.objetivo ?? null,
+    avance: data.avance ?? 0,
   };
   db().proyecciones.unshift(proyeccion);
 
@@ -205,6 +217,121 @@ export function crearProyeccion(data: NuevaProyeccion): {
     });
   }
   return { proyeccion, ingreso };
+}
+
+/** Aporta avance a una proyección personal (barra §5.3A). */
+export function aportarProyeccion(proyeccion_id: string, monto: number): Proyeccion {
+  const p = db().proyecciones.find((x) => x.id === proyeccion_id);
+  if (!p) throw new Error("Proyección no encontrada");
+  if (monto <= 0) throw new Error("El aporte debe ser mayor que 0");
+  const objetivo = p.objetivo ?? p.costo_estimado ?? 0;
+  p.avance = objetivo > 0 ? Math.min(objetivo, (p.avance ?? 0) + monto) : (p.avance ?? 0) + monto;
+  if (objetivo > 0 && (p.avance ?? 0) >= objetivo) p.estado = "lograda";
+  else if ((p.avance ?? 0) > 0) p.estado = "en_progreso";
+  return p;
+}
+
+// ── Nodo Yo: tareas, semanas, reuniones (§7) ───────────────────────
+export interface NuevaTarea {
+  ambito: Tarea["ambito"];
+  titulo: string;
+  descripcion?: string;
+  prioridad?: number;
+  vinculo_meta_id?: string | null;
+  vinculo_proyeccion_id?: string | null;
+}
+
+export function crearTarea(data: NuevaTarea): Tarea {
+  const activa = getSemanaActiva();
+  if (!activa) throw new Error("No hay semana activa");
+  const tarea: Tarea = {
+    id: uid("tar"),
+    semana_id: activa.id,
+    ambito: data.ambito,
+    titulo: data.titulo,
+    descripcion: data.descripcion,
+    estado: "pendiente",
+    heredada: false,
+    prioridad: data.prioridad ?? 3,
+    vinculo_meta_id: data.vinculo_meta_id ?? null,
+    vinculo_proyeccion_id: data.vinculo_proyeccion_id ?? null,
+  };
+  db().tareas.push(tarea);
+  return tarea;
+}
+
+export function cambiarEstadoTarea(
+  tarea_id: string,
+  estado: Tarea["estado"]
+): Tarea {
+  const t = db().tareas.find((x) => x.id === tarea_id);
+  if (!t) throw new Error("Tarea no encontrada");
+  t.estado = estado;
+  return t;
+}
+
+/**
+ * §7 — Cierra la semana activa, crea la siguiente (lunes–domingo) y arrastra
+ * las tareas pendientes/aplazadas marcándolas heredada=true.
+ */
+export function iniciarNuevaSemana(): { semana: Semana; arrastradas: number } {
+  const actual = getSemanaActiva();
+  if (actual) actual.activa = false;
+
+  const base = actual ? new Date(actual.fecha_fin) : new Date();
+  base.setDate(base.getDate() + 1); // día siguiente al fin de la anterior
+  const { inicio, fin } = rangoSemana(base);
+
+  const nueva: Semana = {
+    id: uid("sem"),
+    fecha_inicio: inicio,
+    fecha_fin: fin,
+    activa: true,
+  };
+  db().semanas.push(nueva);
+
+  let arrastradas = 0;
+  if (actual) {
+    const pendientes = db().tareas.filter(
+      (t) => t.semana_id === actual.id && t.estado !== "hecha"
+    );
+    for (const t of pendientes) {
+      db().tareas.push({
+        ...t,
+        id: uid("tar"),
+        semana_id: nueva.id,
+        estado: "pendiente",
+        heredada: true,
+      });
+      arrastradas++;
+    }
+  }
+  return { semana: nueva, arrastradas };
+}
+
+export interface NuevaReunion {
+  ambito: Reunion["ambito"];
+  titulo: string;
+  con_quien?: string;
+  inicio: string;
+  fin?: string | null;
+  notas?: string;
+}
+
+export function crearReunion(data: NuevaReunion): Reunion {
+  const reunion: Reunion = {
+    id: uid("reu"),
+    ambito: data.ambito,
+    titulo: data.titulo,
+    con_quien: data.con_quien,
+    inicio: data.inicio,
+    fin: data.fin ?? null,
+    fuente: "manual",
+    calendly_event_id: null,
+    notas: data.notas,
+  };
+  db().reuniones.push(reunion);
+  return reunion;
 }
 
 // ── Ensamble de entrada del motor + corrida ────────────────────────
