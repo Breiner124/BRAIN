@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import { IncomeQuickAdd } from "@/components/finance/IncomeQuickAdd";
 import { ProjectionForm } from "@/components/finance/ProjectionForm";
 import { ProjectionControls } from "@/components/finance/ProjectionControls";
+import { ProjectionMeta } from "@/components/finance/ProjectionMeta";
 import { ScenarioSlider } from "@/components/finance/ScenarioSlider";
 import {
   getEscenarios,
@@ -109,9 +110,7 @@ export default async function EcomPage() {
                         de facturación para pagarse sola.
                       </p>
                     ) : null}
-                    {p.fecha_objetivo && (
-                      <p className="text-xs text-muted">Objetivo: {p.fecha_objetivo}</p>
-                    )}
+                    <ProjectionMeta p={p} />
                   </li>
                 ))}
               </ul>
@@ -129,23 +128,23 @@ export default async function EcomPage() {
             ) : (
               <ul className="space-y-3">
                 {proyecciones.map((p) => (
-                  <li
-                    key={p.id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-surface-2 p-3"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-fg">{p.nombre}</p>
-                      <p className="text-xs text-muted">
-                        {p.tipo === "ingreso_esperado"
-                          ? `${formatCOP(p.facturacion_esperada ?? 0)}/mes`
-                          : p.costo_recurrente
-                          ? `Costo ${formatCOP(p.costo_recurrente)}/mes`
-                          : p.costo_estimado
-                          ? `Inversión ${formatCOP(p.costo_estimado)}`
-                          : p.tipo}
-                      </p>
+                  <li key={p.id} className="rounded-xl border border-border bg-surface-2 p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold text-fg">{p.nombre}</p>
+                        <p className="text-xs text-muted">
+                          {p.tipo === "ingreso_esperado"
+                            ? `${formatCOP(p.facturacion_esperada ?? 0)}/mes`
+                            : p.costo_recurrente
+                            ? `Costo ${formatCOP(p.costo_recurrente)}/mes`
+                            : p.costo_estimado
+                            ? `Inversión ${formatCOP(p.costo_estimado)}`
+                            : p.tipo}
+                        </p>
+                      </div>
+                      <ProjectionControls p={p} />
                     </div>
-                    <ProjectionControls p={p} />
+                    <ProjectionMeta p={p} />
                   </li>
                 ))}
               </ul>

@@ -48,6 +48,13 @@ export interface NuevaProyeccion {
   ganancia?: { monto: number; fuente: FuenteIngreso; es_facturacion?: boolean };
 }
 
+export interface ProyeccionPatch {
+  estado?: Proyeccion["estado"];
+  fecha_objetivo?: string | null;
+  fecha_tipo?: "fija" | "variable";
+  notas?: string;
+}
+
 export interface NuevaTarea {
   ambito: Tarea["ambito"];
   titulo: string;

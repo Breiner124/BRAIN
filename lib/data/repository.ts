@@ -30,6 +30,7 @@ import type {
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  ProyeccionPatch,
   ReunionCalendly,
 } from "@/lib/data/contracts";
 import { correrMotor, facturacionDiariaPromedio, type EngineInput } from "@/lib/engine";
@@ -44,6 +45,7 @@ export type {
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  ProyeccionPatch,
   ReunionCalendly,
 } from "@/lib/data/contracts";
 
@@ -105,13 +107,13 @@ export const crearDeuda = (data: NuevaDeuda): Promise<Deuda> =>
   SB() ? sb.crearDeuda(data) : Promise.resolve(mem.crearDeuda(data));
 export const eliminarDeuda = (deuda_id: string): Promise<{ id: string }> =>
   SB() ? sb.eliminarDeuda(deuda_id) : Promise.resolve(mem.eliminarDeuda(deuda_id));
-export const actualizarEstadoProyeccion = (
+export const actualizarProyeccion = (
   id: string,
-  estado: Proyeccion["estado"]
+  patch: ProyeccionPatch
 ): Promise<Proyeccion> =>
   SB()
-    ? sb.actualizarEstadoProyeccion(id, estado)
-    : Promise.resolve(mem.actualizarEstadoProyeccion(id, estado));
+    ? sb.actualizarProyeccion(id, patch)
+    : Promise.resolve(mem.actualizarProyeccion(id, patch));
 export const eliminarProyeccion = (id: string): Promise<{ id: string }> =>
   SB() ? sb.eliminarProyeccion(id) : Promise.resolve(mem.eliminarProyeccion(id));
 export const crearProyeccion = (data: NuevaProyeccion) =>

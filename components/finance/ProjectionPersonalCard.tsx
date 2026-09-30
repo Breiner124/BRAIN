@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { ProjectionControls } from "@/components/finance/ProjectionControls";
+import { ProjectionMeta } from "@/components/finance/ProjectionMeta";
 import { ProgressBar } from "@/components/finance/ProgressBar";
 import { formatCOP } from "@/lib/format";
 import type { Proyeccion } from "@/lib/types";
@@ -60,6 +61,8 @@ export function ProjectionPersonalCard({ p }: { p: Proyeccion }) {
           Avance acumulado: {formatCOP(avance)} (sin objetivo definido)
         </p>
       )}
+      <ProjectionMeta p={p} />
+
       <div className="mt-4 flex items-center justify-between gap-2">
         {!completa ? (
           <Button size="sm" variant="outline" onClick={() => setAbrir(true)}>

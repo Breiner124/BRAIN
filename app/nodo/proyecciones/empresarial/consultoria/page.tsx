@@ -6,6 +6,7 @@ import { ProgressBar } from "@/components/finance/ProgressBar";
 import { IncomeQuickAdd } from "@/components/finance/IncomeQuickAdd";
 import { ProjectionForm } from "@/components/finance/ProjectionForm";
 import { ProjectionControls } from "@/components/finance/ProjectionControls";
+import { ProjectionMeta } from "@/components/finance/ProjectionMeta";
 import { getIngresos, getProyecciones, getUnidades } from "@/lib/data/repository";
 import { formatCOP } from "@/lib/format";
 
@@ -90,24 +91,19 @@ export default async function ConsultoriaPage() {
             ) : (
               <ul className="space-y-3">
                 {proyecciones.map((p) => (
-                  <li
-                    key={p.id}
-                    className="flex items-center justify-between rounded-xl border border-border bg-surface-2 p-3"
-                  >
-                    <div>
+                  <li key={p.id} className="rounded-xl border border-border bg-surface-2 p-3">
+                    <div className="flex items-center justify-between gap-2">
                       <p className="font-semibold text-fg">{p.nombre}</p>
-                      {p.fecha_objetivo && (
-                        <p className="text-xs text-muted">{p.fecha_objetivo}</p>
-                      )}
+                      <div className="flex flex-col items-end gap-1">
+                        {p.facturacion_esperada ? (
+                          <p className="font-bold text-fg">
+                            {formatCOP(p.facturacion_esperada)}
+                          </p>
+                        ) : null}
+                        <ProjectionControls p={p} />
+                      </div>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      {p.facturacion_esperada ? (
-                        <p className="font-bold text-fg">
-                          {formatCOP(p.facturacion_esperada)}
-                        </p>
-                      ) : null}
-                      <ProjectionControls p={p} />
-                    </div>
+                    <ProjectionMeta p={p} />
                   </li>
                 ))}
               </ul>

@@ -25,6 +25,7 @@ import type {
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  ProyeccionPatch,
   ReunionCalendly,
 } from "@/lib/data/contracts";
 
@@ -235,13 +236,26 @@ export async function eliminarDeuda(deuda_id: string): Promise<{ id: string }> {
   return { id: deuda_id };
 }
 
-export async function actualizarEstadoProyeccion(
+export async function actualizarProyeccion(
   proyeccion_id: string,
-  estado: Proyeccion["estado"]
+  patch: ProyeccionPatch
 ): Promise<Proyeccion> {
+  const set: Record<string, unknown> = {};
+  if (patch.estado) set.estado = patch.estado;
+  if (patch.fecha_objetivo !== undefined) set.fecha_objetivo = patch.fecha_objetivo || null;
+  if (patch.fecha_tipo) set.fecha_tipo = patch.fecha_tipo;
+  if (patch.notas !== undefined) {
+    const cur = await admin()
+      .from("proyecciones")
+      .select("detalle")
+      .eq("id", proyeccion_id)
+      .single();
+    const detalle = ((ok(cur) as { detalle?: Record<string, unknown> } | null)?.detalle) ?? {};
+    set.detalle = { ...detalle, notas: patch.notas };
+  }
   const res = await admin()
     .from("proyecciones")
-    .update({ estado })
+    .update(set)
     .eq("id", proyeccion_id)
     .select("*")
     .single();

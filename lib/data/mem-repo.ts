@@ -22,6 +22,7 @@ import type {
   NuevaTarea,
   NuevoEgreso,
   NuevoIngreso,
+  ProyeccionPatch,
   ReunionCalendly,
 } from "@/lib/data/contracts";
 
@@ -223,13 +224,16 @@ export function aportarProyeccion(proyeccion_id: string, monto: number): Proyecc
   return p;
 }
 
-export function actualizarEstadoProyeccion(
+export function actualizarProyeccion(
   proyeccion_id: string,
-  estado: Proyeccion["estado"]
+  patch: ProyeccionPatch
 ): Proyeccion {
   const p = db().proyecciones.find((x) => x.id === proyeccion_id);
   if (!p) throw new Error("Proyección no encontrada");
-  p.estado = estado;
+  if (patch.estado) p.estado = patch.estado;
+  if (patch.fecha_objetivo !== undefined) p.fecha_objetivo = patch.fecha_objetivo || null;
+  if (patch.fecha_tipo) p.fecha_tipo = patch.fecha_tipo;
+  if (patch.notas !== undefined) p.detalle = { ...(p.detalle ?? {}), notas: patch.notas };
   return p;
 }
 
