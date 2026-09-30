@@ -33,6 +33,13 @@ export function admin(): SupabaseClient {
   }
   cache = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      // CRÍTICO: evita que Next.js cachee las lecturas de Supabase.
+      // Sin esto, los datos recién guardados no se ven hasta que expira
+      // el Data Cache (minutos/horas). Con no-store, cada lectura es fresca.
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
   });
   return cache;
 }

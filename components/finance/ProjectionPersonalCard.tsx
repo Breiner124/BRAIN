@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { ProjectionControls } from "@/components/finance/ProjectionControls";
 import { ProgressBar } from "@/components/finance/ProgressBar";
 import { formatCOP } from "@/lib/format";
 import type { Proyeccion } from "@/lib/types";
@@ -59,11 +60,16 @@ export function ProjectionPersonalCard({ p }: { p: Proyeccion }) {
           Avance acumulado: {formatCOP(avance)} (sin objetivo definido)
         </p>
       )}
-      {!completa && (
-        <Button size="sm" variant="outline" className="mt-4" onClick={() => setAbrir(true)}>
-          Aportar avance
-        </Button>
-      )}
+      <div className="mt-4 flex items-center justify-between gap-2">
+        {!completa ? (
+          <Button size="sm" variant="outline" onClick={() => setAbrir(true)}>
+            Aportar avance
+          </Button>
+        ) : (
+          <span />
+        )}
+        <ProjectionControls p={p} />
+      </div>
 
       <Modal open={abrir} onClose={() => setAbrir(false)} title={`Aportar a ${p.nombre}`}>
         <div className="space-y-3">
